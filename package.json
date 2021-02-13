@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "## Usage",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7"
+  },
   "devDependencies": {
     "eslint": "^7.20.0"
   },
   "scripts": {
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
