@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-MAINTAINER Kento Nishi <kento24gs@outlook.com>
+LABEL authors="Kento Nishi <kento24gs@outlook.com>, Ronak Badhe <ronak.badhe@gmail.com>"
 
 RUN apt update
 
