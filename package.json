@@ -1,0 +1,23 @@
+{
+  "name": "kanatran",
+  "version": "1.0.0",
+  "description": "## Usage",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^7.20.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LiveTL/kanatran.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LiveTL/kanatran/issues"
+  },
+  "homepage": "https://github.com/LiveTL/kanatran#readme"
+}

@@ -3,7 +3,7 @@ services:
   watcher:
     network_mode: bridge
     build:
-      context: ./watcher/.
+      context: ./
       dockerfile: Dockerfile
     image: watcher
     # container_name: watcher
@@ -11,5 +11,3 @@ services:
     stdin_open: true
     tty: true
     working_dir: /usr/src/watcher
-    volumes:
-      - ./watcher:/usr/src/watcher
