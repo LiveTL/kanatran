@@ -1,19 +1,22 @@
-NAME ?= kanatran_watcher_1
-INSTANCES ?= 1
+name = kanatran_watcher_1
+instances = 1
 
-build:
-	docker-compose build
+.built: watcher docker-compose.yml
+	@docker-compose build
+	@touch .built
 
-run:
-	docker-compose up -d --scale $(NAME)=$(INSTANCES)
+build: .built
 
-start: build run
+start: build
+	@docker-compose up -d --scale $(name)=$(instances)
 
 attach: 
-	docker attach $(NAME)
+	@docker attach $(name)
 
 stop:
-	docker stop $(NAME)
+	@docker stop $(name)
 
 kill:
-	docker kill $(NAME)
+	@docker kill $(name)
+
+.PHONY: build start attach stop kill

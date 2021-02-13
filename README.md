@@ -14,8 +14,8 @@ git clone https://github.com/LiveTL/Kanatran
 
 ### Build / Run
 ```bash
-# default INSTANCES is 3
-make start INSTANCES=1
+# default instances is 3
+make start instances=1
 # instances are tagged by their index
-make attach NAME=kanatran_watcher_1
+make attach name=kanatran_watcher_1
 ```
