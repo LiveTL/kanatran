@@ -1,4 +1,4 @@
-NAME ?= watcher
+NAME ?= kanatran_watcher_1
 INSTANCES ?= 1
 
 build:
