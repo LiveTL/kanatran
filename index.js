@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
+const { exec } = require('child_process');
 app.use(bodyParser.json());
 const PORT = process.env.PORT || 8080;
 
 app.post('/github', function (req, res) {
-  console.log(req.body);
   res.status(200);
+  if(req.body.ref === 'refs/heads/master' ) {
+    exec('git reset --hard HEAD; git fetch --all; git pull;');
+  }
 });
 
 app.get('/', function (req, res) {
