@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  watcher:
+    network_mode: bridge
+    build:
+      context: ./watcher/.
+      dockerfile: Dockerfile
+    image: watcher
+    # container_name: watcher
+    restart: always
+    stdin_open: true
+    tty: true
