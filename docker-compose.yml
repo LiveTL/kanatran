@@ -10,3 +10,5 @@ services:
     restart: always
     stdin_open: true
     tty: true
+    volumes:
+      - ./watcher:/usr/src/watcher
