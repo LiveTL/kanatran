@@ -4,13 +4,13 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 const PORT = process.env.PORT || 8080;
 
-app.post('/', function (req, res) {
+app.post('/github', function (req, res) {
   console.log(req.body);
-  res.send(200);
+  res.status(200);
 });
 
 app.get('/', function (req, res) {
-  res.send(200);
+  res.status(200);
 });
 
 app.listen(PORT, () => {
