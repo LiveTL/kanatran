@@ -10,3 +10,4 @@ services:
     stdin_open: true
     tty: true
     working_dir: /usr/src/watcher
+    shm_size: '2gb'
