@@ -93,6 +93,7 @@ recognition.onstart = () => {
 
 let begin = new Date().getTime();
 let lastSrt = srtTimestamp(0);
+// TODO use grumpy api to get the initial timestamp
 fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
   begin = d.epoch;
   lastSrt = srtTimestamp(d.duration * 1000);
@@ -105,6 +106,8 @@ const send = async (text, translation, actuallySend = true) => {
   const srtTime = [lastSrt, srtTimestamp(time)];
   if (actuallySend) {
     console.log(`${text}\n%c${translation}`, 'font-size: x-large');
+    // TODO also post to grumpy's api
+    // keep this for logging purposes
     await fetch('/transcript', {
       method: 'POST',
       headers: {

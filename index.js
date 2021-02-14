@@ -17,6 +17,8 @@ app.post('/github', (req, res) => {
   }
 });
 
+// TODO grumpy webhook
+
 app.get('/', (req, res) => {
   res.redirect('https://github.com/LiveTL/kanatran');
   res.status(200);
