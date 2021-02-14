@@ -9,7 +9,7 @@ app.post('/github', function (req, res) {
   res.status(200);
   if(req.body.ref === 'refs/heads/master' ) {
     console.log('Pulling new changes and rebooting if neccessary...');
-    exec('git reset --hard HEAD; git fetch --all; git pull;');
+    exec('make update');
   }
 });
 
