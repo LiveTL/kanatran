@@ -6,14 +6,22 @@
 * `docker`
 * `docker-compose`
 * `make`
+* `npm`
+* `node`
 
-### Clone
+### Setup
 ```bash
 git clone https://github.com/LiveTL/Kanatran
 ```
 
 ### Build / Run
-#### Commands
+
+#### Server Commands
+| Command | Description |
+|:--------|:------------|
+| `npm start` | Runs the server. |
+
+#### Docker Commands
 | Command | Description |
 |:--------|:------------|
 | `make build` | Builds the image. |

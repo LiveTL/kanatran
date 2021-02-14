@@ -1,9 +1,11 @@
 const express = require('express');
-const app = express();
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
-app.use(bodyParser.json());
+
 const PORT = process.env.PORT || 8080;
+
+const app = express();
+app.use(bodyParser.json());
 
 app.post('/github', function (req, res) {
   res.status(200);
@@ -16,6 +18,7 @@ app.post('/github', function (req, res) {
 });
 
 app.get('/', function (req, res) {
+  res.redirect('https://github.com/LiveTL/kanatran');
   res.status(200);
 });
 
