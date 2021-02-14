@@ -7,6 +7,9 @@ update: .pull build
 
 start: build spawn
 
+stop:
+	@docker-compose down
+
 spawn:
 	@docker-compose down
 	@docker-compose run -d -e VIDEO=$(video) --name $(video) watcher
