@@ -17,7 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from models import ClientError, TranscriptEvent
 from transcribe import aio_write_transcripts
 
-static = Path(__file__).resolve().parent / "../web"
+static = Path(__file__).resolve().parent / "../public"
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=static), name="static")
@@ -28,8 +28,6 @@ session = aiohttp.ClientSession()
 # ytl = YTLiveService(os.environ.get("CHANNEL_ID", "UCZlDXzGoo7d44bwdNObFacg"))
 
 translate = ts.bing
-link_url = "http://localhost:6969/link"
-bruh = Path(__file__).parent / "../bruh.txt"
 
 
 async def translate(jap: str) -> Optional[str]:
@@ -39,31 +37,8 @@ async def translate(jap: str) -> Optional[str]:
     return None
 
 
-async def get_live_link():
-    r = await session.request(method="GET", url=link_url)
-    return await r.text()
-
-
-def parse_live_link(link: str) -> str:
-    return re.search(r"\?v\=(.+)", link).group(1)
-
-
-async def get_video_id() -> str:
-    link = await get_live_link()
-    try:
-        return parse_live_link(link)
-    except Exception as e:
-        print("Video ID Error:", e)
-        try:
-            return get_video_bruh_fallback()
-        except Exception as ee:
-            print("Video ID Fallback Error:", ee)
-            return "testVideoID"
-
-
-def get_video_bruh_fallback() -> str:
-    with open(bruh, 'r') as fin:
-        return parse_live_link(fin.read())
+async def get_video_id() -> Optional[str]:
+    return os.environ.get("VIDEO")
 
 
 def launch_selenium() -> None:
@@ -106,9 +81,5 @@ async def transcript_event(transcript: TranscriptEvent):
 async def root():
     return {"message": "Hello World"}
 
-
-# print(translate("どこに向かわれてるんですかや屋号屋号どこどこに入ってるあの値段で家53って言いたいんだけどあの屋号から直々にさん付けやめてくださいみたいなあの呼び捨てにしてくださいって言うね昔言われたんで屋号と言ってます0口で開封配信とかしてほしいねもしかして自分が vtuber になるために作った組織なんでそんなどうしようも色々あのホロライブプロダクションの中にホロライブホロスターズサンスターで3とかあるんだけどちょっとどうしたんやね"))
-
-# Thread(target=launch_selenium, daemon=True).start()
 web_speech = WebSpeechSlave("http://localhost:42069")
 web_speech.start()

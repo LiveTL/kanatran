@@ -74,11 +74,10 @@ def __get_options(display: bool) -> Options:
             "profile.default_content_setting_values.notifications": 1,
         },
     )
-    if enable_headless:
+    options.add_argument("--no-sandbox")
+    if enable_headless and not display:
         # options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        if not display:
-            options.add_argument("--headless")
+        options.add_argument("--headless")
     return options
 
 

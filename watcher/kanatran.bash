@@ -36,9 +36,7 @@ function playvid() {
 	mpv --no-vid $1 &
 }
 
+python3.8 -m pip install -r server/requirements.txt
 playvid $VLINK &> logs.txt
-sleep 5
-arecord -d 10 bruh.mp3
-upload bruh.mp3 bruh.mp3
-upload logs.txt
+python3.8 -m uvicorn --app-dir=server server:app --port=42069 &> uvlog.txt
 bash
