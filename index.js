@@ -17,6 +17,15 @@ app.post('/github', (req, res) => {
   }
 });
 
+app.post('/stream', (req, res) => {
+  res.status(200);
+  res.end();
+  if (req.body.video) {
+    exec(`make start video="${req.body.video}"`);
+    console.log(`Playing ${req.body.video}`);
+  }
+});
+
 app.get('/', (req, res) => {
   res.redirect('https://github.com/LiveTL/kanatran');
   res.status(200);
