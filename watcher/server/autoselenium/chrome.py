@@ -39,8 +39,13 @@ class ChromeDriver(webdriver.Chrome):
         sb.Popen = old_popen
         self.has_quit = False
 
+
     def quit(self):
-        if not self.has_quit:
+        try:
+            if not self.has_quit:
+                self.has_quit = True
+                super().quit()
+        except AttributeError:
             self.has_quit = True
             super().quit()
 
@@ -65,6 +70,9 @@ def setup_driver() -> None:
 def __get_options(display: bool) -> Options:
     options = Options()
 
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument('--remote-debugging-port=9222')
     options.add_experimental_option(
         "prefs",
         {
@@ -74,7 +82,7 @@ def __get_options(display: bool) -> Options:
             "profile.default_content_setting_values.notifications": 1,
         },
     )
-    options.add_argument("--no-sandbox")
+    # options.add_experimental_option("use-automated-extension", False)
     if enable_headless and not display:
         # options.add_argument("--disable-gpu")
         options.add_argument("--headless")
