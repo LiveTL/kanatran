@@ -15,6 +15,7 @@ from yt import YTLiveService
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from models import ClientError, TranscriptEvent
+from pyvirtualdisplay import Display
 from transcribe import aio_write_transcripts
 
 static = Path(__file__).resolve().parent / "../public"
@@ -22,6 +23,16 @@ static = Path(__file__).resolve().parent / "../public"
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=static), name="static")
 session = aiohttp.ClientSession()
+
+
+class Disp(Display):
+    def __del__(self):
+        self.stop()
+        super().__del__()
+
+
+display = Disp(visible=0, size=(800, 600))
+display.start()
 
 # defaults to kanata
 # print("Using ch", os.environ.get("CHANNEL_ID"))

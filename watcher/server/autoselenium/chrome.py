@@ -55,8 +55,11 @@ class ChromeDriver(webdriver.Chrome):
 
 def get_selenium(display: bool = False) -> webdriver.Chrome:
     options = __get_options(display)
+    with open("bruh", 'w+') as fout:
+        p = str(Path(__platform_drivers[su.platform]).absolute())
+        print(p, Path(p).exists(), file=fout)
     browser = ChromeDriver(
-        executable_path=__platform_drivers[su.platform], options=options
+        executable_path=p, options=options
     )
     return browser
 
@@ -72,7 +75,7 @@ def __get_options(display: bool) -> Options:
 
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    options.add_argument('--remote-debugging-port=9222')
+    options.add_argument("--remote-debugging-port=9222")
     options.add_experimental_option(
         "prefs",
         {
