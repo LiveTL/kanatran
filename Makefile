@@ -19,5 +19,4 @@ spawn:
 	@git reset --hard HEAD
 	@git fetch --all
 	@git pull
-	@git stash pop
 	@npm install
