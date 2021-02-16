@@ -18,7 +18,7 @@ echo hello world
 
 log $(whoami)
 
-# /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+/usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
 addgroup $(whoami) audio
 pulseaudio -vvvv -D --exit-idle-time=-1
 sleep 1
