@@ -16,5 +16,5 @@ spawn:
 
 .pull:
 	@git fetch --all
-	@git pull --autostash
+	@git pull --autostash --rebase
 
