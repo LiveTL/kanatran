@@ -17,4 +17,5 @@ spawn:
 .pull:
 	@git fetch --all
 	@git pull --autostash --rebase
+	npm install
 
