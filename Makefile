@@ -15,7 +15,9 @@ spawn:
 	@docker-compose run -d -e VIDEO=$(video) --name $(video) watcher
 
 .pull:
+	@git stash
+	@git reset --hard HEAD
 	@git fetch --all
-	@git pull --autostash --rebase
-	npm install
-
+	@git pull
+	@git stash pop
+	@npm install
