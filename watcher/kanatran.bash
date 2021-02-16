@@ -18,7 +18,7 @@ echo hello world
 
 log $(whoami)
 
-/usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
+# /usr/bin/Xvfb $DISPLAY -screen 0 1280x1024x24 &
 addgroup $(whoami) audio
 pulseaudio -vvvv -D --exit-idle-time=-1
 sleep 1
@@ -36,7 +36,7 @@ function playvid() {
 	mpv --no-vid $1 &
 }
 
-python3.8 -m pip install -r server/requirements.txt
+# python3.8 -m pip install -r server/requirements.txt
 playvid $VLINK &> logs.txt
-python3.8 -m uvicorn --app-dir=server server:app --port=42069 &> uvlog.txt
+python3 -m uvicorn --app-dir=server server:app --port=42069 &> uvlog.txt
 bash
