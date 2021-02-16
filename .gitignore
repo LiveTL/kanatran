@@ -1,3 +1,7 @@
 *.swp
 .built
 node_modules
+__pycache__/
+drivers/
+*.log
+bruh.txt
