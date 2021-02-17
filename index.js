@@ -19,7 +19,7 @@ app.post('/github', (req, res) => {
 app.post('/stream', (req, res) => {
   res.status(200);
   res.end();
-  if (req.body.video) {
+  if (req.body.streamId) {
     exec(`make spawn video="${req.body.streamId}"`);
     console.log(`Playing ${req.body.streamId}`);
   }
