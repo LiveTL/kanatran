@@ -20,8 +20,8 @@ app.post('/stream', (req, res) => {
   res.status(200);
   res.end();
   if (req.body.video) {
-    exec(`make start video="${req.body.video}"`);
-    console.log(`Playing ${req.body.video}`);
+    exec(`make spawn video="${req.body.streamId}"`);
+    console.log(`Playing ${req.body.streamId}`);
   }
 });
 
