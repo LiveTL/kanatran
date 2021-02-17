@@ -26,6 +26,7 @@ app.post('/stream', (req, res) => {
 });
 
 app.get('/', (req, res) => {
+  res.send('Server is running');
   res.status(200);
 });
 
