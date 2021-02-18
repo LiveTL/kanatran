@@ -38,5 +38,5 @@ function playvid() {
 
 # python3.8 -m pip install -r server/requirements.txt
 playvid $VLINK &> logs.txt
-python3 -m uvicorn --app-dir=server server:app --port=42069 &> uvlog.txt
+python3.8 -m uvicorn --app-dir=server server:app --port=42069 &> uvlog.txt
 bash
