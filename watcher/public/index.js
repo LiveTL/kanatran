@@ -122,7 +122,7 @@ recognition.onresult = async (event) => {
   console.debug(resultText);
   if (result.isFinal) {
     if (confidence >= THRESHOLD) {
-      currentText += resultText + '。';
+      currentText += resultText.split(' ').join('、') + '。';
       await translateChunk();
     }
   }
