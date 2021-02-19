@@ -69,21 +69,7 @@ googleTranslateElementInit = () => {
   }, 1000);
 };
 
-const srtTimestamp = milliseconds => {
-  let seconds = Math.round(milliseconds / 1000);
-  // let milliseconds = seconds * 1000
-  let minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  milliseconds = milliseconds % 1000;
-  seconds = seconds % 60;
-  minutes = minutes % 60;
-  return (hours < 10 ? '0' : '') + hours + ':' +
-    (minutes < 10 ? '0' : '') + minutes + ':' +
-    (seconds < 10 ? '0' : '') + seconds + ',' +
-    (milliseconds < 100 ? '0' : '') + (milliseconds < 10 ? '0' : '') + milliseconds;
-};
-
-recognition.continuous = true;
+// recognition.continuous = true;
 recognition.interimResults = true;
 // let lasttime = new Date().getTime()
 
@@ -92,18 +78,15 @@ recognition.onstart = () => {
 };
 
 let begin = new Date().getTime();
-let lastSrt = srtTimestamp(0);
 // TODO use grumpy api to get the initial timestamp
 fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
   begin = d.epoch;
-  lastSrt = srtTimestamp(d.duration * 1000);
 });
 
 
 const send = async (text, translation, actuallySend = true) => {
   const current = new Date().getTime();
   const time = current - begin;
-  const srtTime = [lastSrt, srtTimestamp(time)];
   if (actuallySend) {
     console.log(`${text}\n%c${translation}`, 'font-size: x-large');
     // TODO also post to grumpy's api
@@ -116,13 +99,11 @@ const send = async (text, translation, actuallySend = true) => {
       },
       body: JSON.stringify({
         timestamp: time / 1000,
-        srtTime,
         text,
         translation
       })
     });
   }
-  lastSrt = srtTime[1];
 };
 
 let currentText = '';
