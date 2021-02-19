@@ -83,7 +83,7 @@ const srtTimestamp = milliseconds => {
     (milliseconds < 100 ? '0' : '') + (milliseconds < 10 ? '0' : '') + milliseconds;
 };
 
-// recognition.continuous = true
+recognition.continuous = true;
 recognition.interimResults = true;
 // let lasttime = new Date().getTime()
 
