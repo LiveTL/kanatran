@@ -128,7 +128,7 @@ recognition.onresult = async (event) => {
   }
 };
 
-recognition.onspeechend = () => recognition.stop();
+recognition.onaudioend = () => recognition.stop();
 
 recognition.onerror = async e => {
   console.error('Error', e);
