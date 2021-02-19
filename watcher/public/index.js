@@ -127,12 +127,12 @@ const send = async (text, translation, actuallySend = true) => {
 
 let currentText = '';
 
-setInterval(async () => {
+const translateChunk = async () => {
   const backupText = currentText;
   currentText = '';
   const translation = (await translate(backupText)).replaceAll('。', '.');
   await send(backupText, translation, backupText);
-}, 15000);
+};
 
 recognition.onresult = async (event) => {
   const result = event.results[event.results.length - 1];
@@ -142,6 +142,7 @@ recognition.onresult = async (event) => {
   if (result.isFinal) {
     if (confidence >= THRESHOLD) {
       currentText += resultText + '。';
+      await translateChunk();
     }
   }
 };
