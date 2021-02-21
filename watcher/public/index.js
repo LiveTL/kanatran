@@ -83,6 +83,11 @@ fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
   begin = d.epoch;
 });
 
+let LIVETL_API_KEY = null;
+fetch('/info').then(r => r.json()).then(r => {
+  LIVETL_API_KEY = r.api_key;
+});
+
 
 const send = async (text, translation, actuallySend = true) => {
   const current = new Date().getTime();

@@ -88,6 +88,11 @@ async def transcript_event(transcript: TranscriptEvent):
     return 200
 
 
+@app.get("/info")
+async def info():
+    return {"api_key": os.environ.get("LIVETL_API_KEY")}
+
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
