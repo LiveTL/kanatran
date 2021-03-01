@@ -78,7 +78,6 @@ recognition.onstart = () => {
 };
 
 let begin = new Date().getTime();
-// TODO use grumpy api to get the initial timestamp
 fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
   begin = d.epoch;
 });
@@ -88,15 +87,27 @@ fetch('/info').then(r => r.json()).then(r => {
   LIVETL_API_KEY = r.api_key;
 });
 
+const API = 'https://api.livetl.app';
+// https://livetl.app/en/docs/api
+// step 1: open the connection
+fetch(`${API}/session/open`,{
+  method: 'GET',
+  headers: {
+    'Client-Name': 'Kanatran',
+    'API-Key': LIVETL_API_KEY
+  }
+});
 
-const send = async (text, translation, actuallySend = true) => {
+// step 2: ?????
+// step 3: send to LiveTL api
+// step 4: profit
+const send = async (text, translation) => {
   const current = new Date().getTime();
   const time = current - begin;
-  if (actuallySend) {
+  if (text || translation) {
     console.log(`${text}\n%c${translation}`, 'font-size: x-large');
-    // TODO also post to grumpy's api
     // keep this for logging purposes
-    await fetch('/transcript', {
+    fetch('/transcript', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -108,6 +119,7 @@ const send = async (text, translation, actuallySend = true) => {
         translation
       })
     });
+    // TODO: post to LiveTL API here
   }
 };
 
@@ -117,7 +129,7 @@ const translateChunk = async () => {
   const backupText = currentText;
   currentText = '';
   const translation = (await translate(backupText)).replaceAll('。', '.');
-  await send(backupText, translation, backupText);
+  await send(backupText, translation);
 };
 
 recognition.onresult = async (event) => {
@@ -147,7 +159,6 @@ recognition.onerror = async e => {
       message: `${e.error}: ${e.message}`
     })
   });
-  // await send(' {e.error}:  {e.message}')
 };
 
 recognition.onend = () => {
