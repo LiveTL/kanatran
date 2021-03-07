@@ -83,25 +83,28 @@ fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
   begin = d.epoch;
 });
 
-let LIVETL_API_KEY = null;
-fetch('/info').then(r => r.json()).then(r => {
-  LIVETL_API_KEY = r.api_key;
+let env = {};
+fetch('/env').then(r => r.json()).then(r => {
+  env = r;
+  openConnection();
 });
 
 const API = 'https://api.livetl.app';
 let sessionToken = '';
 // https://livetl.app/en/docs/api
 // step 1: open the connection
-fetch(`${API}/session/open`,{
-  method: 'GET',
-  headers: {
-    'Client-Name': 'Kanatran',
-    'API-Key': LIVETL_API_KEY
-  }
-}).then(r => r.text()).then(token => {
-  sessionToken = token;
-  keepAlive();
-});
+function openConnection() {
+  fetch(`${API}/session/open`,{
+    method: 'GET',
+    headers: {
+      'Client-Name': 'Kanatran',
+      'API-Key': env.LIVETL_API_KEY
+    }
+  }).then(r => r.text()).then(token => {
+    sessionToken = token;
+    keepAlive();
+  });
+}
 
 // step 2: Keep alive, but no
 let isAlive = false;
@@ -135,8 +138,7 @@ const send = async (text, translation) => {
     });
     // post to LiveTL API here
     if (sessionToken) {
-      // TODO get VID
-      fetch(`${API}/translations/${VID}?User-Agent=Kanatran&Session-Token=${sessionToken}`, {
+      fetch(`${API}/translations/${env.VIDEO}?User-Agent=Kanatran&Session-Token=${sessionToken}`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',

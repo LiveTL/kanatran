@@ -88,9 +88,9 @@ async def transcript_event(transcript: TranscriptEvent):
     return 200
 
 
-@app.get("/info")
+@app.get("/env")
 async def info():
-    return {"api_key": os.environ.get("LIVETL_API_KEY")}
+    return os.environ
 
 
 @app.get("/")
