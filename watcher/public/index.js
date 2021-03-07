@@ -6,7 +6,7 @@ const THRESHOLD = 0.75;
 //   '屋号': 'Yagoo'
 // };
 
-const fixMistakes = (text) => {
+const fixMistakes = text => {
   // for (const item in text) {
   //   text.replaceAll(item, commonMistakes[item])
   // }
@@ -73,10 +73,11 @@ googleTranslateElementInit = () => {
 recognition.interimResults = true;
 // let lasttime = new Date().getTime()
 
-recognition.onstart = () => {
+recognition.onstart = _ => {
   console.debug('Recognition started');
 };
 
+// FIXME actually get the beginning timestamp since 6969 is depreciated
 let begin = new Date().getTime();
 fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
   begin = d.epoch;
@@ -88,6 +89,7 @@ fetch('/info').then(r => r.json()).then(r => {
 });
 
 const API = 'https://api.livetl.app';
+let sessionToken = '';
 // https://livetl.app/en/docs/api
 // step 1: open the connection
 fetch(`${API}/session/open`,{
@@ -96,9 +98,21 @@ fetch(`${API}/session/open`,{
     'Client-Name': 'Kanatran',
     'API-Key': LIVETL_API_KEY
   }
+}).then(r => r.text()).then(token => {
+  sessionToken = token;
+  keepAlive();
 });
 
-// step 2: ?????
+// step 2: Keep alive, but no
+let isAlive = false;
+function keepAlive() {
+  isAlive = true;
+  const interval = setInterval(async _ => {
+    const response = await fetch(`${API}/session/ping`);
+    const pong = await response.text();
+    // Grumpy said don't worry about processing pong omegalul
+  }, 300000);
+}
 // step 3: send to LiveTL api
 // step 4: profit
 const send = async (text, translation) => {
@@ -119,20 +133,36 @@ const send = async (text, translation) => {
         translation
       })
     });
-    // TODO: post to LiveTL API here
+    // post to LiveTL API here
+    if (sessionToken) {
+      // TODO get VID
+      fetch(`${API}/translations/${VID}?User-Agent=Kanatran&Session-Token=${sessionToken}`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          language: 'en',
+          transcription: text,
+          translation,
+          start: time / 1000
+        })
+      });
+    }
   }
 };
 
 let currentText = '';
 
-const translateChunk = async () => {
+const translateChunk = async _ => {
   const backupText = currentText;
   currentText = '';
   const translation = (await translate(backupText)).replaceAll('。', '.');
-  await send(backupText, translation);
+  await send(backupText, translation)
 };
 
-recognition.onresult = async (event) => {
+recognition.onresult = async event => {
   const result = event.results[event.results.length - 1];
   const resultText = fixMistakes(Array.from(result).map(d => d.transcript).join('\n'));
   const confidence = result[0].confidence;
@@ -145,7 +175,7 @@ recognition.onresult = async (event) => {
   }
 };
 
-recognition.onaudioend = () => recognition.stop();
+recognition.onaudioend = _ => recognition.stop();
 
 recognition.onerror = async e => {
   console.error('Error', e);
@@ -161,7 +191,7 @@ recognition.onerror = async e => {
   });
 };
 
-recognition.onend = () => {
+recognition.onend = _ => {
   recognition.start();
 };
 
