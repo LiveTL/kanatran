@@ -127,16 +127,18 @@ const send = async (text, translation) => {
   if (text || translation) {
     console.log(`${text}\n%c${translation}`, 'font-size: x-large');
     // keep this for logging purposes
-    fetch('/transcript', {
+    fetch('/logs', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        timestamp: time / 1000,
-        text,
-        translation
+        text: JSON.stringify({
+          timestamp: time / 1000,
+          text,
+          translation
+        })
       })
     });
     // post to LiveTL API here
@@ -153,6 +155,17 @@ const send = async (text, translation) => {
           translation,
           start: time / 1000
         })
+      }).catch(error => {
+        fetch('/logs', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: error.toString()
+          })
+        });
       });
     }
   }

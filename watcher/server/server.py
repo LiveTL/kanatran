@@ -14,7 +14,7 @@ from workers import WebSpeechSlave
 from yt import YTLiveService
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from models import ClientError, TranscriptEvent
+from models import ClientError, Log
 from pyvirtualdisplay import Display
 from transcribe import aio_write_transcripts
 
@@ -76,15 +76,9 @@ async def refresh():
     return 200
 
 
-@app.post("/transcript")
-async def transcript_event(transcript: TranscriptEvent):
-    print("Got transcript:", transcript.text)
-    print("At time:", transcript.timestamp)
-    print("Browser translation:", transcript.translation)
-    vid = await get_video_id()
-    await aio_write_transcripts(
-        vid, transcript.text, transcript.translation, transcript.srtTime, transcript.timestamp
-    )
+@app.post("/logs")
+async def transcript_event(log: Log):
+    print(log.text)
     return 200
 
 
