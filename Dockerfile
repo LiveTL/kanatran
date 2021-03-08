@@ -18,6 +18,7 @@ RUN apt-get install -y /tmp/google-chrome.deb
 RUN apt-get install -y python3.8 python3.8-distutils
 RUN python3.8 /tmp/get-pip.py
 ADD watcher /usr/src/watcher
+ADD watcher/server/requirements.txt /usr/src/watcher/requirements.txt
 RUN python3.8 -m pip install -r /usr/src/watcher/server/requirements.txt
 
 CMD ["bash", "/usr/src/watcher/kanatran.bash"]
