@@ -15,6 +15,8 @@ stop:
 spawn:
 	@docker-compose run -d -e VIDEO=$(video) $(env) --name $(video) watcher
 
+reboot: stop spawn
+
 .pull:
 	@git stash
 	@git reset --hard HEAD
