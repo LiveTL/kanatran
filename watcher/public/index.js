@@ -73,7 +73,7 @@ googleTranslateElementInit = () => {
 recognition.interimResults = true;
 // let lasttime = new Date().getTime()
 
-recognition.onstart = _ => {
+recognition.onstart = () => {
   console.debug('Recognition started');
 };
 
@@ -109,9 +109,12 @@ function openConnection() {
 // step 2: Keep alive, but no
 let isAlive = false;
 function keepAlive() {
+  // eslint-disable-next-line no-unused-vars
   isAlive = true;
-  const interval = setInterval(async _ => {
+  // eslint-disable-next-line no-unused-vars
+  const interval = setInterval(async () => {
     const response = await fetch(`${API}/session/ping`);
+    // eslint-disable-next-line no-unused-vars
     const pong = await response.text();
     // Grumpy said don't worry about processing pong omegalul
   }, 300000);
@@ -157,11 +160,11 @@ const send = async (text, translation) => {
 
 let currentText = '';
 
-const translateChunk = async _ => {
+const translateChunk = async () => {
   const backupText = currentText;
   currentText = '';
   const translation = (await translate(backupText)).replaceAll('。', '.');
-  await send(backupText, translation)
+  await send(backupText, translation);
 };
 
 recognition.onresult = async event => {
@@ -177,7 +180,7 @@ recognition.onresult = async event => {
   }
 };
 
-recognition.onaudioend = _ => recognition.stop();
+recognition.onaudioend = () => recognition.stop();
 
 recognition.onerror = async e => {
   console.error('Error', e);
@@ -193,7 +196,7 @@ recognition.onerror = async e => {
   });
 };
 
-recognition.onend = _ => {
+recognition.onend = () => {
   recognition.start();
 };
 
