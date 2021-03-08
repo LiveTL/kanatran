@@ -102,6 +102,16 @@ function openConnection() {
     }
   }).then(r => r.text()).then(token => {
     sessionToken = token;
+    fetch('/logs', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: token
+      })
+    });
     keepAlive();
   });
 }
@@ -149,9 +159,8 @@ const send = async (text, translation) => {
           Accept: 'application/json',
           'Content-Type': 'application/json',
           'Client-Name': 'Kanatran',
-          'API-Key': env.LIVETL_API_KEY,
           'User-Agent': 'Kanatran',
-          'Session-Token': 'sessionToken'
+          'Session-Token': sessionToken
         },
         body: JSON.stringify({
           language: 'en',
