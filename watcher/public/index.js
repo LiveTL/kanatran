@@ -143,11 +143,15 @@ const send = async (text, translation) => {
     });
     // post to LiveTL API here
     if (sessionToken) {
-      fetch(`${API}/translations/${env.VIDEO}?User-Agent=Kanatran&Session-Token=${sessionToken}`, {
+      fetch(`${API}/translations/${env.VIDEO}`, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Client-Name': 'Kanatran',
+          'API-Key': env.LIVETL_API_KEY,
+          'User-Agent': 'Kanatran',
+          'Session-Token': 'sessionToken'
         },
         body: JSON.stringify({
           language: 'en',
