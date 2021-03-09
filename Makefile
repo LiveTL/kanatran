@@ -2,6 +2,8 @@ video = 'xHP6lpOepk4'
 env = $(shell cat .env | sed 's|\(.*\)|\-e \1|g')
 # https://youtu.be/DMmJZ1q2ZN8?t=778
 
+.PHONY: build update start stop spawn reboot
+
 build:
 	@docker-compose build
 
