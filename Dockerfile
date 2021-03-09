@@ -12,7 +12,7 @@ RUN apt-get install -y mpv pulseaudio xvfb libxkbcommon-x11-0 libxcb-icccm4 libx
 RUN apt-get remove -y youtube-dl
 RUN curl -L https://yt-dl.org/latest/youtube-dl -k -o /usr/bin/youtube-dl
 RUN chmod +x /usr/bin/youtube-dl
-RUN curl https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/google-chrome.deb
+RUN curl -L https://github.com/LiveTL/kanatran/releases/download/v1.0.0/google-chrome.deb -o /tmp/google-chrome.deb
 ADD https://bootstrap.pypa.io/get-pip.py /tmp/get-pip.py
 RUN apt-get install -y /tmp/google-chrome.deb
 RUN apt-get install -y python3.8 python3.8-distutils
