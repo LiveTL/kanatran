@@ -5,12 +5,14 @@ from threading import Event, Lock, Thread
 
 from autoselenium import chrome
 
+
 class WebSpeechSlave(Thread):
     """
     Opens up web speech in the browser
 
     export REFRESH_CHROME="1" to enable refreshing
     """
+
     refresh_interval = 60 * 15
 
     def __init__(self, host: str):

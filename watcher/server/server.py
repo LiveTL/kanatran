@@ -7,16 +7,16 @@ from pprint import pprint
 from threading import Thread
 from typing import Optional
 
-import translators as ts
 import aiohttp
+import translators as ts
 from autoselenium import chrome
-from workers import WebSpeechSlave
-from yt import YTLiveService
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from models import ClientError, Log
 from pyvirtualdisplay import Display
 from transcribe import aio_write_transcripts
+from workers import WebSpeechSlave
+from yt import YTLiveService
 
 static = Path(__file__).resolve().parent / "../public"
 
@@ -90,6 +90,7 @@ async def info():
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
 
 web_speech = WebSpeechSlave("http://localhost:42069")
 web_speech.start()
