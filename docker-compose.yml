@@ -3,8 +3,8 @@ services:
   watcher:
     network_mode: bridge
     build:
-      context: ./
-      dockerfile: Dockerfile
+      context: ./watcher
+      dockerfile: ./Dockerfile
     image: watcher
     restart: always
     stdin_open: true
