@@ -16,5 +16,5 @@ jobs:
           make build container=watcher
       - name: Publish
         run: |
-          docker tag watcher ghcr.io/LiveTL/kanatran:latest
-          docker push ghcr.io/LiveTL/kanatran:latest
+          docker tag watcher ghcr.io/livetl/kanatran:latest
+          docker push ghcr.io/livetl/kanatran:latest
