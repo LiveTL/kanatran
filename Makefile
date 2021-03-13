@@ -16,6 +16,9 @@ build:
 
 update: .pull
 
+start:
+	@cd controller; node src/index.js
+
 stop:
 	@docker-compose down
 
