@@ -14,10 +14,12 @@ services:
   runner:
     network_mode: bridge
     build:
-      context: ./runner
-      dockerfile: ./Dockerfile
+      context: ./
+      dockerfile: ./runner/Dockerfile
     image: runner
     restart: always
     stdin_open: true
     tty: true
     working_dir: /usr/src/runner
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

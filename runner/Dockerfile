@@ -3,8 +3,9 @@ FROM mhart/alpine-node:14
 LABEL authors="Kento Nishi <kento24gs@outlook.com>, Ronak Badhe <ronak.badhe@gmail.com>"
 LABEL org.opencontainers.image.source=https://github.com/LiveTL/runner
 
-ADD src /usr/src/runner
+ADD runner/src /usr/src/runner
 WORKDIR /usr/src/runner
-RUN npm install 
+RUN npm install
+ADD Makefile /usr/src/runner/Makefile
 
-CMD ["node", "/usr/src/runner/index.js"]
+CMD ["node", "index.js"]
