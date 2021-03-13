@@ -10,3 +10,10 @@ socket.on('play', (data) => {
     id: data.id  
   });
 });
+socket.on('connect', () => {
+  console.log(`Runner is active! Socket ID is ${socket.id}`);
+});
+socket.on('disconnect', () => {
+  console.log(`${socket.id} disconnected`);
+});
+console.log('Runner started');
