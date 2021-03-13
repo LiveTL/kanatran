@@ -14,7 +14,7 @@ endif
 build:
 	@docker-compose build $(DFLAGS) $(image)
 
-update: .pull build
+update: .pull
 
 stop:
 	@docker-compose down
