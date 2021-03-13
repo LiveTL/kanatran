@@ -1,0 +1,20 @@
+name: Build Runner
+
+on: workflow_dispatch
+
+jobs:
+  build_runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Init
+        run: |
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ secrets.CR_USERNAME }} --password-stdin
+      - name: Build
+        run: |
+          make build container=runner
+      - name: Publish
+        run: |
+          docker tag runner ghcr.io/livetl/runner:latest
+          docker push ghcr.io/livetl/runner:latest

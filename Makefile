@@ -1,6 +1,6 @@
 py = python3
 video = 'xHP6lpOepk4'
-container = 'watcher'
+image = 'watcher'
 env = $(shell cat .env | sed 's|\(.*\)|\-e \1|g')
 DFLAGS = 
 # https://youtu.be/DMmJZ1q2ZN8?t=778
@@ -12,19 +12,18 @@ endif
 .PHONY: build update start stop spawn reboot format
 
 build:
-	@docker-compose build $(DFLAGS) $(container)
+	@docker-compose build $(DFLAGS) $(image)
 
 update: .pull build
-
-start: build stop spawn
 
 stop:
 	@docker-compose down
 
-spawn:
-	@docker-compose run -d -e VIDEO=$(video) $(env) --name $(video) $(container)
+run:
+	@docker-compose run -d runner
 
-reboot: stop spawn
+spawn:
+	@docker-compose run -d -e VIDEO=$(video) $(env) --name $(video) $(image)
 
 .gitignore: requirements.txt
 	@$(py) -m pip install -r requirements.txt
