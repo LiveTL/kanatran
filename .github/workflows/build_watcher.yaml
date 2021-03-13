@@ -6,6 +6,8 @@ jobs:
   build_watcher:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Init
         run: |
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ secrets.CR_USERNAME }} --password-stdin
