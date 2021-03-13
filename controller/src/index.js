@@ -12,6 +12,9 @@ app.use(bodyParser.json());
 
 let sockets = {};
 
+app.get('/', (req, res) =>{
+  res.send('Running');
+});
 app.post('/stream', (req, res) => {
   res.status(200);
   res.end();
