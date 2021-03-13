@@ -15,9 +15,14 @@ build:
 	@docker-compose build $(DFLAGS) $(image)
 
 update: .pull
+	@pkill node
+	@make start
 
 start:
-	@cd controller; nodemon src/index.js
+	@cd controller; node src/index.js
+
+init:
+	@cd controller; npm install;
 
 stop:
 	@docker-compose down
