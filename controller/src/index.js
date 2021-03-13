@@ -30,7 +30,7 @@ app.post('/github', (req, res) => {
   res.end();
   if (req.body.ref === 'refs/heads/master' ) {
     console.log('Pulling new changes and rebooting if neccessary...');
-    exec('cd ..; make update').stdout.pipe(process.stdout);
+    exec('cd ..; make update &').stdout.pipe(process.stdout);
   }
 });
 io.on('connection', (socket) => {
