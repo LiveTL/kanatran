@@ -43,4 +43,6 @@ format: .gitignore node_modules
 	@git checkout master
 	@git fetch --all
 	@git pull
+	@cd controller
 	@npm install
+	@cd ..
