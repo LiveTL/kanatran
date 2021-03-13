@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 LABEL authors="Kento Nishi <kento24gs@outlook.com>, Ronak Badhe <ronak.badhe@gmail.com>"
-LABEL org.opencontainers.image.source=https://github.com/LiveTL/kanatran
+LABEL org.opencontainers.image.source=https://github.com/LiveTL/watcher
 
 RUN apt-get update
 RUN apt-get install -y software-properties-common
