@@ -17,11 +17,12 @@ git clone https://github.com/LiveTL/Kanatran
 Create a `.env` file with the following:
 ```env
 LIVETL_API_KEY="api key here"
+CONTROLLER_URL='controller url here'
 ```
 
-### Build / Run
+### Dev Info
 
-#### Server Commands
+#### Commands
 * `make init`: Initialize the controller server
 * `make build image={runner or watcher}`: Build images
 * `make start`: Start the controller server

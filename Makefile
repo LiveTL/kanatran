@@ -27,7 +27,7 @@ stop:
 	@docker-compose down
 
 run:
-	@docker-compose run -d runner
+	@docker-compose run -d runner $(env)
 
 spawn:
 	@docker-compose run -d -e VIDEO=$(video) $(env) --name $(video) $(image)

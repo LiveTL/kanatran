@@ -1,6 +1,6 @@
 const io = require('socket.io-client');
 const { exec } = require('child_process');
-const socket = io.connect('localhost', {
+const socket = io.connect(process.env.CONTROLLER_URL || 'localhost', {
   port: 8080
 });
 socket.on('play', (data) => {
