@@ -40,9 +40,9 @@ node_modules: package.json
 	@npm i
 
 format: .gitignore node_modules
-	@$(py) -m black watcher
-	@$(py) -m isort watcher
-	@./node_modules/eslint/bin/eslint.js --fix watcher/public
+	@$(py) -m black .
+	@$(py) -m isort .
+	@./node_modules/eslint/bin/eslint.js --fix .
 
 .pull:
 	@git stash
