@@ -9,10 +9,9 @@ from subprocess import Popen
 from tempfile import TemporaryFile
 from threading import Event, Thread
 
+import requests
 from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
-import requests
-
 from models import Timestamp
 from yt import YTLiveService
 

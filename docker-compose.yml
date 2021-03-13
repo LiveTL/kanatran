@@ -3,11 +3,35 @@ services:
   watcher:
     network_mode: bridge
     build:
-      context: ./
-      dockerfile: Dockerfile
+      context: ./watcher
+      dockerfile: ./Dockerfile
     image: watcher
     restart: always
     stdin_open: true
     tty: true
     working_dir: /usr/src/watcher
     shm_size: '2gb'
+  runner:
+    network_mode: bridge
+    build:
+      context: ./
+      dockerfile: ./runner/Dockerfile
+    image: runner
+    restart: always
+    stdin_open: true
+    tty: true
+    working_dir: /usr/src/runner
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  controller:
+    network_mode: bridge
+    build:
+      context: ./
+      dockerfile: ./controller/Dockerfile
+    image: controller
+    restart: always
+    stdin_open: true
+    tty: true
+    working_dir: /usr/src/controller
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

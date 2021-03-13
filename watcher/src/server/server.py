@@ -7,16 +7,16 @@ from pprint import pprint
 from threading import Thread
 from typing import Optional
 
-import translators as ts
 import aiohttp
+import translators as ts
 from autoselenium import chrome
-from workers import WebSpeechSlave
-from yt import YTLiveService
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from models import ClientError, TranscriptEvent
+from models import ClientError, Log
 from pyvirtualdisplay import Display
 from transcribe import aio_write_transcripts
+from workers import WebSpeechSlave
+from yt import YTLiveService
 
 static = Path(__file__).resolve().parent / "../public"
 
@@ -76,21 +76,21 @@ async def refresh():
     return 200
 
 
-@app.post("/transcript")
-async def transcript_event(transcript: TranscriptEvent):
-    print("Got transcript:", transcript.text)
-    print("At time:", transcript.timestamp)
-    print("Browser translation:", transcript.translation)
-    vid = await get_video_id()
-    await aio_write_transcripts(
-        vid, transcript.text, transcript.translation, transcript.srtTime, transcript.timestamp
-    )
+@app.post("/logs")
+async def transcript_event(log: Log):
+    print(log.text)
     return 200
+
+
+@app.get("/env")
+async def info():
+    return os.environ
 
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
 
 web_speech = WebSpeechSlave("http://localhost:42069")
 web_speech.start()

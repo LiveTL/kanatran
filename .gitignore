@@ -5,3 +5,4 @@ __pycache__/
 drivers/
 *.log
 bruh.txt
+.env

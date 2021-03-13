@@ -39,7 +39,6 @@ class ChromeDriver(webdriver.Chrome):
         sb.Popen = old_popen
         self.has_quit = False
 
-
     def quit(self):
         try:
             if not self.has_quit:
@@ -55,12 +54,10 @@ class ChromeDriver(webdriver.Chrome):
 
 def get_selenium(display: bool = False) -> webdriver.Chrome:
     options = __get_options(display)
-    with open("bruh", 'w+') as fout:
+    with open("bruh", "w+") as fout:
         p = str(Path(__platform_drivers[su.platform]).absolute())
         print(p, Path(p).exists(), file=fout)
-    browser = ChromeDriver(
-        executable_path=p, options=options
-    )
+    browser = ChromeDriver(executable_path=p, options=options)
     return browser
 
 
@@ -98,8 +95,9 @@ __platform_drivers = {
     "linux": pwd / "chromedriver",
 }
 
-# 88.0.4324.27 in beta
-version = "87.0.4280.88"
+# TODO Find a link to latest
+# maybe scrape https://chromedriver.chromium.org/downloads
+version = "89.0.4389.23"
 
 __setup_driver = su.setup_driver(
     {

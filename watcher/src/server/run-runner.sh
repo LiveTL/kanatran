@@ -69,7 +69,7 @@ youtube-dl --version
 
 echo Machine $1
 
-# Actual python should be at /opt/hostedtoolcache/Python/3.8.7/x64/bin/python3
+# Actual python should be at /opt/hostedtoolcache/Python/3.8.7/x64/bin/python3.8
 echo Using $2
 echo Action index $4
 export CHANNEL_ID=$(jq .[$(($1 + $4))].channel channels.json | sed 's/"//g')

@@ -1,0 +1,20 @@
+name: Build Watcher
+
+on: workflow_dispatch
+
+jobs:
+  build_watcher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Init
+        run: |
+          echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ secrets.CR_USERNAME }} --password-stdin
+      - name: Build
+        run: |
+          make build image=watcher
+      - name: Publish
+        run: |
+          docker tag watcher ghcr.io/livetl/watcher:latest
+          docker push ghcr.io/livetl/watcher:latest

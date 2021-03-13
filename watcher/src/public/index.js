@@ -6,7 +6,7 @@ const THRESHOLD = 0.75;
 //   '屋号': 'Yagoo'
 // };
 
-const fixMistakes = (text) => {
+const fixMistakes = text => {
   // for (const item in text) {
   //   text.replaceAll(item, commonMistakes[item])
   // }
@@ -69,21 +69,7 @@ googleTranslateElementInit = () => {
   }, 1000);
 };
 
-const srtTimestamp = milliseconds => {
-  let seconds = Math.round(milliseconds / 1000);
-  // let milliseconds = seconds * 1000
-  let minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  milliseconds = milliseconds % 1000;
-  seconds = seconds % 60;
-  minutes = minutes % 60;
-  return (hours < 10 ? '0' : '') + hours + ':' +
-    (minutes < 10 ? '0' : '') + minutes + ':' +
-    (seconds < 10 ? '0' : '') + seconds + ',' +
-    (milliseconds < 100 ? '0' : '') + (milliseconds < 10 ? '0' : '') + milliseconds;
-};
-
-// recognition.continuous = true
+// recognition.continuous = true;
 recognition.interimResults = true;
 // let lasttime = new Date().getTime()
 
@@ -91,62 +77,147 @@ recognition.onstart = () => {
   console.debug('Recognition started');
 };
 
+// FIXME actually get the beginning timestamp since 6969 is depreciated
 let begin = new Date().getTime();
-let lastSrt = srtTimestamp(0);
-// TODO use grumpy api to get the initial timestamp
 fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
   begin = d.epoch;
-  lastSrt = srtTimestamp(d.duration * 1000);
 });
 
+let env = {};
+fetch('/env').then(r => r.json()).then(r => {
+  env = r;
+  openConnection();
+});
 
-const send = async (text, translation, actuallySend = true) => {
-  const current = new Date().getTime();
-  const time = current - begin;
-  const srtTime = [lastSrt, srtTimestamp(time)];
-  if (actuallySend) {
-    console.log(`${text}\n%c${translation}`, 'font-size: x-large');
-    // TODO also post to grumpy's api
-    // keep this for logging purposes
-    await fetch('/transcript', {
+const API = 'https://api.livetl.app';
+let sessionToken = '';
+// https://livetl.app/en/docs/api
+// step 1: open the connection
+function openConnection() {
+  fetch(`${API}/session/open`,{
+    method: 'GET',
+    headers: {
+      'Client-Name': 'Kanatran',
+      'API-Key': env.LIVETL_API_KEY
+    }
+  }).then(r => r.text()).then(token => {
+    sessionToken = token;
+    fetch('/logs', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        timestamp: time / 1000,
-        srtTime,
-        text,
-        translation
+        text: token
       })
     });
+    keepAlive();
+  });
+}
+
+// step 2: Keep alive, but no
+let isAlive = false;
+function keepAlive() {
+  // eslint-disable-next-line no-unused-vars
+  isAlive = true;
+  // eslint-disable-next-line no-unused-vars
+  const interval = setInterval(async () => {
+    const response = await fetch(`${API}/session/ping`);
+    // eslint-disable-next-line no-unused-vars
+    const pong = await response.text();
+    // Grumpy said don't worry about processing pong omegalul
+  }, 300000);
+}
+// step 3: send to LiveTL api
+// step 4: profit
+const send = async (text, translation) => {
+  const current = new Date().getTime();
+  const time = current - begin;
+  if (text || translation) {
+    console.log(`${text}\n%c${translation}`, 'font-size: x-large');
+    // keep this for logging purposes
+    fetch('/logs', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        text: JSON.stringify({
+          timestamp: time / 1000,
+          text,
+          translation
+        })
+      })
+    });
+    // post to LiveTL API here
+    if (sessionToken) {
+      fetch(`${API}/translations/${env.VIDEO}`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          'Client-Name': 'Kanatran',
+          'User-Agent': 'Kanatran',
+          'Session-Token': sessionToken
+        },
+        body: JSON.stringify({
+          language: 'en',
+          transcription: text,
+          translation,
+          start: time / 1000
+        })
+      }).then(async result=>{
+        fetch('/logs', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: await result.text()
+          })
+        });
+      }).catch(error => {
+        fetch('/logs', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            text: error.toString()
+          })
+        });
+      });
+    }
   }
-  lastSrt = srtTime[1];
 };
 
 let currentText = '';
 
-setInterval(async () => {
+const translateChunk = async () => {
   const backupText = currentText;
   currentText = '';
   const translation = (await translate(backupText)).replaceAll('。', '.');
-  await send(backupText, translation, backupText);
-}, 15000);
+  await send(backupText, translation);
+};
 
-recognition.onresult = async (event) => {
+recognition.onresult = async event => {
   const result = event.results[event.results.length - 1];
   const resultText = fixMistakes(Array.from(result).map(d => d.transcript).join('\n'));
   const confidence = result[0].confidence;
   console.debug(resultText);
   if (result.isFinal) {
     if (confidence >= THRESHOLD) {
-      currentText += resultText + '。';
+      currentText += resultText.split(' ').join('、') + '。';
+      await translateChunk();
     }
   }
 };
 
-recognition.onspeechend = () => recognition.stop();
+recognition.onaudioend = () => recognition.stop();
 
 recognition.onerror = async e => {
   console.error('Error', e);
@@ -160,7 +231,6 @@ recognition.onerror = async e => {
       message: `${e.error}: ${e.message}`
     })
   });
-  // await send(' {e.error}:  {e.message}')
 };
 
 recognition.onend = () => {
