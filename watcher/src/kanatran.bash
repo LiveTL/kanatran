@@ -33,10 +33,13 @@ VLINK="https://www.youtube.com/watch?v=$VIDEO"
 log $VLINK
 
 function playvid() {
-	mpv --no-vid $1 &
+	mpv --no-vid $1
+}
+
+function server() {
+	python3.8 -m uvicorn --app-dir=server server:app --port=42069 &> uvlog.txt
 }
 
 # python3.8 -m pip install -r server/requirements.txt
+server &
 playvid $VLINK &> logs.txt
-python3.8 -m uvicorn --app-dir=server server:app --port=42069 &> uvlog.txt
-bash
