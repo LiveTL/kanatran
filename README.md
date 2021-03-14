@@ -16,8 +16,9 @@ git clone https://github.com/LiveTL/Kanatran
 
 Create a `.env` file with the following:
 ```env
-LIVETL_API_KEY="api key here"
+LIVETL_API_KEY='api key here'
 CONTROLLER_URL='controller url here'
+WATCHER_IMAGE='watcher image name here (probably ghcr.io/livetl/watcher:latest)'
 ```
 
 ### Dev Info

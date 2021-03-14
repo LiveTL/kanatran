@@ -4,10 +4,11 @@ const socket = io.connect(process.env.CONTROLLER_URL || 'localhost', {
   port: 8080
 });
 socket.on('play', (data) => {
-  exec(`make spawn video="${data.streamId}"`);
+  const imageName = process.env.WATCHER_IMAGE || 'ghcr.io/livetl/watcher:latest';
+  exec(`make spawn video="${data.streamId}" image=${imageName}`);
   io.emit('status', {
     playing: true,
-    id: data.id  
+    id: data.id
   });
 });
 socket.on('connect', () => {
