@@ -15,7 +15,7 @@ build:
 	@docker-compose build $(DFLAGS) $(image)
 
 update: .pull
-	@pkill node & make start | make start
+	@pkill node
 
 start:
 	@cd controller; node src/index.js
