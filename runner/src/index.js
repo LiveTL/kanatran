@@ -5,8 +5,15 @@ const socket = io.connect(process.env.CONTROLLER_URL || 'localhost', {
 });
 socket.on('play', (data) => {
   const imageName = process.env.WATCHER_IMAGE || 'ghcr.io/livetl/watcher:latest';
-  exec(`make spawn video="${data.streamId}" image=${imageName}`);
-  io.emit('status', {
+  exec(
+    `docker run -d --rm \\
+    --workdir /usr/src/watcher \\
+    -e VIDEO=${data.streamId} \\
+    --name ${data.streamId} \\
+    ${imageName}`
+  ).stdout.pipe(process.stdout);
+  console.log(`Playing ${data.streamId}`);
+  socket.emit('status', {
     playing: true,
     id: data.id
   });
