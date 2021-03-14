@@ -14,6 +14,8 @@ function upload() {
 		"https://FileUpload.r2dev2bb8.repl.co/upload/$1"
 }
 
+pushd /usr/src/watcher
+
 echo hello world
 
 log $(whoami)
