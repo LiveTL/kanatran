@@ -27,3 +27,4 @@ CONTROLLER_URL='controller url here'
 * `make build image={runner or watcher}`: Build images
 * `make start`: Start the controller server
 * `make run`: Run the local runner
+* `make spawn video={video id}`: Start a translation container
