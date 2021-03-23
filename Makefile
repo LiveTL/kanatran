@@ -1,7 +1,6 @@
 py = python3
 video = 'xHP6lpOepk4'
 image = 'watcher'
-env = $(shell cat .env | sed 's|\(.*\)|\-e \1|g')
 DFLAGS = 
 # https://youtu.be/DMmJZ1q2ZN8?t=778
 
@@ -27,10 +26,10 @@ stop:
 	@docker-compose down
 
 run:
-	@docker-compose run -d $(env) runner
+	@docker-compose run -d runner
 
 spawn:
-	@docker-compose run -d -e VIDEO=$(video) $(env) --name $(video) $(image)
+	@docker-compose run -d -e VIDEO=$(video) --name $(video) $(image)
 
 .gitignore: requirements.txt
 	@$(py) -m pip install -r requirements.txt
