@@ -13,7 +13,6 @@
 ```bash
 git clone https://github.com/LiveTL/Kanatran
 ```
-> Make sure to clone the repo with `LF` line endings.
 
 Create a `.env` file with the following:
 ```env
