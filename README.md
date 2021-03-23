@@ -23,6 +23,12 @@ WATCHER_IMAGE='watcher image name here (probably ghcr.io/livetl/watcher:latest)'
 
 ### Dev Info
 
+If the translations stall for periods, adjust the chrome refresh interval (in minutes).
+
+```env
+CHROME_REFRESH='5'
+```
+
 #### Commands
 * `make init`: Initialize the controller server
 * `make build image={runner or watcher}`: Build images

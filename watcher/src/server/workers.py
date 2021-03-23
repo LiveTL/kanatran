@@ -10,10 +10,11 @@ class WebSpeechSlave(Thread):
     """
     Opens up web speech in the browser
 
-    export REFRESH_CHROME="1" to enable refreshing
+    export CHROME_REFRESH="x" to refresh chrome after x minutes
+                                default is 10
     """
 
-    refresh_interval = 60 * 15
+    refresh_interval = 60 * int(os.environ.get("CHROME_REFRESH", 10))
 
     def __init__(self, host: str):
         super().__init__(daemon=True)
@@ -35,9 +36,3 @@ class WebSpeechSlave(Thread):
             del self._web
             gc.collect()
             self._web = newweb
-
-    def __wait_for_refresh(self):
-        if int(os.environ.get("REFRESH_CHROME", 0)):
-            time.sleep(self.refresh_interval)
-        else:
-            Event().wait()
