@@ -3,7 +3,7 @@ const ENDPOINT = process.env.CONTROLLER_URL || 'ws://localhost:8000';
 const WebSocket = require('ws');
 
 function play(data, ws){
-  const imageName = process.env.WATCHER_IMAGE || 'ghcr.io/livetl/watcher:latest';
+  const imageName = process.env.WATCHER_IMAGE || 'watcher';
   exec(
     `docker run -d --rm \\
       --workdir /usr/src/watcher \\
