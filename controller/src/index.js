@@ -7,7 +7,6 @@ const server = require('http').createServer(app);
 const ws = require('ws');
 
 const PORT = process.env.PORT || 8080;
-
 app.use(bodyParser.json());
 
 let sockets = {};
@@ -36,20 +35,22 @@ app.post('/github', (req, res) => {
     exec('cd ..; make update &').stdout.pipe(process.stdout);
   }
 });
+
 const wsServer = new ws.Server({ noServer: true });
-wsServer.on('connection', (socket, req) => {
-  const SOCKETID = req.socket.remoteAddress;
-  console.log(`Connected to ${SOCKETID}`);
-  sockets[SOCKETID] = socket;
+wsServer.on('connection', (socket) => {
+  console.log(`Connected to ${socket.id}`);
+  sockets[socket.id] = socket;
   socket.send(JSON.stringify({
     event: 'socketid',
-    data: SOCKETID
+    data: socket.id
   }));
 });
+
 server.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}/`);
 }).on('upgrade', (request, socket, head) => {
   wsServer.handleUpgrade(request, socket, head, socket => {
+    socket.id = request.socket.remoteAddress;
     wsServer.emit('connection', socket, request);
   });
 });
