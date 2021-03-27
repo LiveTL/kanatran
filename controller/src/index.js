@@ -6,7 +6,7 @@ const app = express();
 const server = require('http').createServer(app);
 const ws = require('ws');
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
 
 let sockets = {};
@@ -15,17 +15,28 @@ app.get('/', (req, res) =>{
   res.send('Running');
 });
 app.post('/stream', (req, res) => {
-  res.status(200);
-  res.end();
-  Object.keys(sockets).forEach(id =>{
-    sockets[id].send(JSON.stringify({
-      event: 'play', 
-      data:{
-        id,
-        streamId: req.body.streamId
-      }
-    }));
+  let item = null;
+  Object.keys(sockets).forEach(id => {
+    if (item == null || 
+        sockets[id].runningContainers / sockets[id].maxContainers 
+        < sockets[item].runningContainers / sockets[item].maxContainers) {
+      item = id;
+    }
   });
+  if (item){
+    sockets[item].socket.send(JSON.stringify({
+      event: 'play', 
+      id: item,
+      streamId: req.body.streamId
+    }));
+    sockets[item].runningContainers++;
+    console.log(`Playing ${req.body.streamId} on ${item}`);
+    res.status(200);
+  } else {
+    console.log('No machines to play on');
+    res.status(503);
+  }
+  res.end();
 });
 app.post('/github', (req, res) => {
   res.status(200);
@@ -39,11 +50,24 @@ app.post('/github', (req, res) => {
 const wsServer = new ws.Server({ noServer: true });
 wsServer.on('connection', (socket) => {
   console.log(`Connected to ${socket.id}`);
-  sockets[socket.id] = socket;
+  sockets[socket.id] = {socket};
   socket.send(JSON.stringify({
     event: 'socketid',
-    data: socket.id
+    id: socket.id
   }));
+  socket.on('message', data => {
+    data = JSON.parse(data);
+    switch (data.event){
+    case 'status': {
+      break;
+    } case 'info':{
+      sockets[socket.id].maxContainers = data.maxContainers;
+      sockets[socket.id].runningContainers = 0;
+      console.log(`Initialized ${socket.id} limits`);
+      break;
+    }
+    }
+  });
 });
 
 server.listen(PORT, () => {
@@ -54,3 +78,16 @@ server.listen(PORT, () => {
     wsServer.emit('connection', socket, request);
   });
 });
+
+/*
+await fetch('/stream', {
+  method: 'post',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    streamId: 'xHP6lpOepk4'
+  })
+})
+*/
