@@ -1,27 +1,95 @@
-const io = require('socket.io-client');
-const { exec } = require('child_process');
-const socket = io.connect(process.env.CONTROLLER_URL || 'localhost', {
-  port: 8080
-});
-socket.on('play', (data) => {
-  const imageName = process.env.WATCHER_IMAGE || 'ghcr.io/livetl/watcher:latest';
+require('../../common/logs.js');
+
+const {exec} = require('child_process');
+const ENDPOINT = process.env.CONTROLLER_URL || 'ws://localhost:8000';
+const WebSocket = require('ws');
+const monitor = require('node-docker-monitor');
+const { exit } = require('process');
+let ws = null;
+const imageName = process.env.WATCHER_IMAGE || 'watcher';
+
+let playing = {};
+let shutdown = false;
+
+function play(data){
   exec(
     `docker run -d --rm \\
-    --workdir /usr/src/watcher \\
-    -e VIDEO=${data.streamId} \\
-    --name ${data.streamId} \\
-    ${imageName}`
+      --workdir /usr/src/watcher \\
+      -e VIDEO=${data.streamId} \\
+      --name ${data.streamId} \\
+      ${imageName}`
   ).stdout.pipe(process.stdout);
-  console.log(`Playing ${data.streamId}`);
-  socket.emit('status', {
-    playing: true,
-    id: data.id
+  console.log(`Starting ${data.streamId} if not already playing`);
+}
+
+const MAX_CONTAINERS = parseInt(process.env.MAX_CONTAINERS || 2);
+function connect () {
+  ws = new WebSocket(ENDPOINT);
+  ws.on('open', () => {
+    console.log('Runner is active!');
+
+    monitor({
+      onContainerUp: (container) => {
+        if (!shutdown && container.Image === imageName && !playing[container.Name]) {
+          ws.send(JSON.stringify({
+            event: 'status',
+            playing: true,
+            video: container.Name
+          }));
+          console.log(`${container.Name} is playing!`);
+          playing[container.Name] = true;
+        }
+      },
+    
+      onContainerDown: (container) => {
+        if (!shutdown && container.Image === imageName && playing[container.Name]) {
+          ws.send(JSON.stringify({
+            event: 'status',
+            playing: false,
+            video: container.Name
+          }));
+          console.log(`${container.Name} is done`);
+          delete playing[container.Name];
+        }
+      }
+    });
   });
-});
-socket.on('connect', () => {
-  console.log(`Runner is active! Socket ID is ${socket.id}`);
-});
-socket.on('disconnect', () => {
-  console.log('Socket disconnected. Retrying...');
-});
-console.log('Runner started');
+  ws.on('message', (data) => {
+    data = JSON.parse(data);
+    switch (data.event){
+    case 'socketid': {
+      console.log(`ID is ${data.id}`);
+      ws.send(JSON.stringify({
+        event: 'info',
+        maxContainers: MAX_CONTAINERS
+      }));
+      break;
+    } case 'play': {
+      play(data);
+    }
+    }
+  });
+  ws.on('close', () => {
+    console.log('Socket disconnected. Retrying...');
+    setTimeout(connect, 2500);
+  });
+  ws.on('error', console.log);
+}
+connect();
+console.log(`Runner started, connecting to ${ENDPOINT}`);
+
+function exitHandler() {
+  shutdown = true;
+  console.log('Cleaning up before exit...');
+  exec(`docker rm $(docker stop $(docker ps -a -q --filter ancestor=${imageName} --format="{{.ID}}"))`)
+    .stdout.pipe(process.stdout);
+  exit(0);
+}
+
+process.on('exit', exitHandler);
+process.on('SIGINT', exitHandler);
+process.on('SIGUSR1', exitHandler);
+process.on('SIGUSR2', exitHandler);
+process.on('SIGINT', exitHandler);
+process.on('SIGTERM', exitHandler);
+process.on('uncaughtException', exitHandler);
