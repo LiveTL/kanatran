@@ -13,6 +13,7 @@ jobs:
           echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ secrets.CR_USERNAME }} --password-stdin
       - name: Build
         run: |
+          touch .env
           make build image=watcher
       - name: Publish
         run: |

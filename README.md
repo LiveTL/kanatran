@@ -18,8 +18,8 @@ Create a `.env` file with the following:
 ```env
 LIVETL_API_KEY='api key here'
 CONTROLLER_URL='controller url here'
-WATCHER_IMAGE='watcher image name here (probably ghcr.io/livetl/watcher:latest)'
-MAX_CONTAINERS=2
+WATCHER_IMAGE='watcher image name here (probably ghcr.io/livetl/watcher:latest or just watcher)'
+MAX_CONTAINERS='number of max containers here'
 ```
 
 ### Dev Info
