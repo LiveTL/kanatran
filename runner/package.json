@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "node-docker-monitor": "^1.0.11",
+    "tar-fs": "^2.1.1",
     "ws": "^7.4.4"
   },
   "devDependencies": {},
