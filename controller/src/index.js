@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
-
+const { Queue } = require('./queue.js');
 const app = express();
 const server = require('http').createServer(app);
 const ws = require('ws');
@@ -11,15 +11,34 @@ app.use(bodyParser.json());
 
 let sockets = {};
 
-app.get('/', (req, res) =>{
-  res.send('Running');
+app.get('/', (req, res) => {
+  res.send(`
+<pre>
+await fetch('/stream', {
+  method: 'post',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    streamId: 'xHP6lpOepk4'
+  })
 });
-app.post('/stream', (req, res) => {
+</pre>
+  `);
+});
+
+const queue = new Queue();
+
+function runQueue() {
+  console.log(`Attempting to assign ${queue.length} streams`);
+  if (!queue.length) return;
   let item = null;
   Object.keys(sockets).forEach(id => {
+    const numRunning = Object.keys(sockets[id].runningContainers).length;
     if (item == null || 
-        sockets[id].runningContainers / sockets[id].maxContainers 
-        < sockets[item].runningContainers / sockets[item].maxContainers) {
+        numRunning / sockets[id].maxContainers <
+        numRunning / sockets[item].maxContainers) {
       item = id;
     }
   });
@@ -27,15 +46,20 @@ app.post('/stream', (req, res) => {
     sockets[item].socket.send(JSON.stringify({
       event: 'play', 
       id: item,
-      streamId: req.body.streamId
+      streamId: queue.top.data
     }));
-    sockets[item].runningContainers++;
-    console.log(`Playing ${req.body.streamId} on ${item}`);
-    res.status(200);
+    console.log(`Requesting to play ${queue.top.data} on ${item}`);
+    queue.pop();
   } else {
-    console.log('No machines to play on');
-    res.status(503);
+    console.log('No machines currently available');
   }
+}
+
+app.post('/stream', (req, res) => {
+  queue.push(req.body.streamId);
+  console.log(`Queued ${req.body.streamId} (priority: ${queue.length})`);
+  runQueue();
+  res.status(200);
   res.end();
 });
 app.post('/github', (req, res) => {
@@ -59,14 +83,33 @@ wsServer.on('connection', (socket) => {
     data = JSON.parse(data);
     switch (data.event){
     case 'status': {
+      if (data.playing) {
+        sockets[socket.id].runningContainers[data.video] = true;
+        console.log(`${data.video} is playing on ${socket.id}`);
+      } else {
+        if (sockets[socket.id]) {
+          delete sockets[socket.id].runningContainers[data.video];
+        }
+        console.log(`Finished playing ${data.video} on ${socket.id}`);
+      }
       break;
     } case 'info':{
       sockets[socket.id].maxContainers = data.maxContainers;
-      sockets[socket.id].runningContainers = 0;
+      sockets[socket.id].runningContainers = {};
       console.log(`Initialized ${socket.id} limits`);
       break;
     }
     }
+  });
+  socket.on('close', () => {
+    console.log(`${socket.id} disconnected. Reallocating...`);
+    if (sockets[socket.id]) {
+      Object.keys(sockets[socket.id].runningContainers).forEach(item => {
+        queue.push(item);
+      });
+      delete sockets[socket.id];
+    }
+    runQueue();
   });
 });
 
@@ -78,16 +121,3 @@ server.listen(PORT, () => {
     wsServer.emit('connection', socket, request);
   });
 });
-
-/*
-await fetch('/stream', {
-  method: 'post',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    streamId: 'xHP6lpOepk4'
-  })
-})
-*/
