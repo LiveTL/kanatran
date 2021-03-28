@@ -22,7 +22,7 @@ function play(data){
   console.log(`Starting ${data.streamId} if not already playing`);
 }
 
-const MAX_CONTAINERS = process.env.MAX_CONTAINERS || 2;
+const MAX_CONTAINERS = parseInt(process.env.MAX_CONTAINERS || 2);
 function connect () {
   ws = new WebSocket(ENDPOINT);
   ws.on('open', () => {
