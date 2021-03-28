@@ -1,3 +1,5 @@
+require('../../common/logs.js');
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
@@ -97,6 +99,7 @@ wsServer.on('connection', (socket) => {
       sockets[socket.id].maxContainers = data.maxContainers;
       sockets[socket.id].runningContainers = {};
       console.log(`Initialized ${socket.id} limits`);
+      runQueue();
       break;
     }
     }

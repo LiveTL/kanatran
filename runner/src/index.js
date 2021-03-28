@@ -1,5 +1,6 @@
-const {exec} = require('child_process');
+require('../../common/logs.js');
 
+const {exec} = require('child_process');
 const ENDPOINT = process.env.CONTROLLER_URL || 'ws://localhost:8000';
 const WebSocket = require('ws');
 const monitor = require('node-docker-monitor');
