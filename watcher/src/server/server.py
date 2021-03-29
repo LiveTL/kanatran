@@ -1,4 +1,6 @@
 import asyncio
+import functools
+import io
 import os
 import re
 import sys
@@ -8,15 +10,17 @@ from threading import Thread
 from typing import Optional
 
 import aiohttp
+import requests
 import translators as ts
+import youtube_dl
 from autoselenium import chrome
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from models import ClientError, Log
+from models import ClientError, Log, Timestamp
 from pyvirtualdisplay import Display
 from transcribe import aio_write_transcripts
 from workers import WebSpeechSlave
-from yt import YTLiveService
+from yt import YTLiveService, get_timestamp
 
 static = Path(__file__).resolve().parent / "../public"
 
@@ -61,6 +65,14 @@ def launch_selenium() -> None:
     except Exception:
         pass
     web.get("http://localhost:42069/static/index.html")
+
+
+@app.get("/timestamp", response_model=Timestamp)
+async def timestamp():
+    vid = await get_video_id()
+    loop = asyncio.get_event_loop()
+    timestamp = await loop.run_in_executor(None, get_timestamp, vid)
+    return Timestamp(current=timestamp)
 
 
 @app.post("/error")
