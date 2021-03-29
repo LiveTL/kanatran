@@ -2,16 +2,21 @@
 
 ## Usage
 
-### Configure a `.env` file
-```env
-LIVETL_API_KEY=
-CONTROLLER_URL=
-WATCHER_IMAGE=watcher
-MAX_CONTAINERS=2
-CHROME_REFRESH=10
-```
 
-### Run the pre-built image
+1. Pull the latest images
+    ```bash
+    docker pull ghcr.io/livetl/watcher:latest
+    docker pull ghcr.io/livetl/runner:latest
+    ```
+1. Configure a `.env` file
+    ```env
+    LIVETL_API_KEY=
+    CONTROLLER_URL=
+    WATCHER_IMAGE=watcher
+    MAX_CONTAINERS=2
+    CHROME_REFRESH=10
+    ```
+1.  Run the pre-built image
 ```bash
 docker run -v /var/run/docker.sock:/var/run/docker.sock --env-file .env ghcr.io/livetl/runner
 ```
