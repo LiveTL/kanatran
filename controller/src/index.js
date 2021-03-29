@@ -46,10 +46,9 @@ function runQueue() {
     allKeys.forEach(id => {
       const candidate = Object.keys(sockets[id].runningContainers).length;
       const current = Object.keys(sockets[item].runningContainers).length;
-      if (item == null || 
-          candidate < sockets[id].maxContainers && 
+      if (candidate < sockets[id].maxContainers && (item == null || 
           candidate / sockets[id].maxContainers <
-          current / sockets[item].maxContainers) {
+          current / sockets[item].maxContainers)) {
         item = id;
       }
     });
