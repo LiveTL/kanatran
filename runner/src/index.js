@@ -27,12 +27,13 @@ function play(data){
 }
 
 const MAX_CONTAINERS = parseInt(process.env.MAX_CONTAINERS || 2);
+let dockerMonitor = null;
 function connect () {
   ws = new WebSocket(ENDPOINT);
   ws.on('open', () => {
     console.log('Runner is active!');
 
-    monitor({
+    if (!dockerMonitor) monitor({
       onContainerUp: (container) => {
         if (!shutdown && container.Image === IMAGE_NAME && !playing[container.Name]) {
           ws.send(JSON.stringify({
@@ -70,6 +71,17 @@ function connect () {
       break;
     } case 'play': {
       play(data);
+      break;
+    } case 'initdone': {
+      Object.keys(playing).forEach(video => {
+        ws.send(JSON.stringify({
+          event: 'status',
+          playing: true,
+          video
+        }));
+        console.log(`Established that ${video} is still running`);
+      });
+      break;
     }
     }
   });

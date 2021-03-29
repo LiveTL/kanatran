@@ -111,6 +111,9 @@ wsServer.on('connection', (socket) => {
       sockets[socket.id].runningContainers = {};
       console.log(`Initialized ${socket.id} limits`);
       runQueue();
+      socket.send(JSON.stringify({
+        event: 'initdone'
+      }));
       break;
     }
     }
