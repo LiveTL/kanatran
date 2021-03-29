@@ -15,9 +15,10 @@
     ```env
     LIVETL_API_KEY=
     CONTROLLER_URL=
-    WATCHER_IMAGE=watcher
+    WATCHER_IMAGE=ghcr.io/livetl/watcher
     MAX_CONTAINERS=2
     CHROME_REFRESH=10
+    LIVETL_API_URL=https://api.livetl.app
     ```
 1.  Run the pre-built image
     ```bash
@@ -38,6 +39,7 @@
 ```bash
 git clone https://github.com/LiveTL/Kanatran
 ```
+Make sure to replace your `WATCHER_IMAGE` in `.env` with `watcher` to use your development image.
 
 ### Dev Info
 
