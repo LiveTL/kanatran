@@ -86,10 +86,11 @@ fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
 let env = {};
 fetch('/env').then(r => r.json()).then(r => {
   env = r;
+  API = env.LIVETL_API_URL || API;
   openConnection();
 });
 
-const API = 'https://api.livetl.app';
+let API = 'https://api.livetl.app';
 let sessionToken = '';
 // https://livetl.app/en/docs/api
 // step 1: open the connection
