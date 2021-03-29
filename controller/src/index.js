@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 let sockets = {};
 
 function updateLog() {
-  fs.writeFile('sockets.log', JSON.stringify(sockets, 
+  fs.writeFile('sockets.txt', JSON.stringify(sockets, 
     (key, val) => key == 'socket' ? undefined : val, 2), () => {}); 
 }
 
