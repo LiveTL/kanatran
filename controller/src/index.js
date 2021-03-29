@@ -7,11 +7,17 @@ const { Queue } = require('./queue.js');
 const app = express();
 const server = require('http').createServer(app);
 const ws = require('ws');
+const fs = require('fs');
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
 
 let sockets = {};
+
+function updateLog() {
+  fs.writeFile('sockets.log', JSON.stringify(sockets, 
+    (key, val) => key == 'socket' ? undefined : val, 2), () => {}); 
+}
 
 app.get('/', (req, res) => {
   res.send(`
@@ -34,29 +40,31 @@ const queue = new Queue();
 
 function runQueue() {
   console.log(`Attempting to assign ${queue.length} streams`);
-  if (!queue.length) return;
-  const allKeys = Object.keys(sockets);
-  let item = allKeys[0];
-  allKeys.forEach(id => {
-    const candidate = Object.keys(sockets[id].runningContainers).length;
-    const current = Object.keys(sockets[item].runningContainers).length;
-    if (item == null || 
-        candidate / sockets[id].maxContainers <
-        current / sockets[item].maxContainers) {
-      item = id;
+  if (queue.length) {
+    const allKeys = Object.keys(sockets);
+    let item = allKeys[0];
+    allKeys.forEach(id => {
+      const candidate = Object.keys(sockets[id].runningContainers).length;
+      const current = Object.keys(sockets[item].runningContainers).length;
+      if (item == null || 
+          candidate / sockets[id].maxContainers <
+          current / sockets[item].maxContainers) {
+        item = id;
+      }
+    });
+    if (item){
+      sockets[item].socket.send(JSON.stringify({
+        event: 'play', 
+        id: item,
+        streamId: queue.top.data
+      }));
+      console.log(`Requesting to play ${queue.top.data} on ${item}`);
+      queue.pop();
+    } else {
+      console.log('No machines currently available');
     }
-  });
-  if (item){
-    sockets[item].socket.send(JSON.stringify({
-      event: 'play', 
-      id: item,
-      streamId: queue.top.data
-    }));
-    console.log(`Requesting to play ${queue.top.data} on ${item}`);
-    queue.pop();
-  } else {
-    console.log('No machines currently available');
   }
+  updateLog();
 }
 
 app.post('/stream', (req, res) => {
@@ -96,6 +104,7 @@ wsServer.on('connection', (socket) => {
         }
         console.log(`Finished playing ${data.video} on ${socket.id}`);
       }
+      runQueue();
       break;
     } case 'info':{
       sockets[socket.id].maxContainers = data.maxContainers;
@@ -120,6 +129,7 @@ wsServer.on('connection', (socket) => {
 
 server.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}/`);
+  updateLog();
 }).on('upgrade', (request, socket, head) => {
   wsServer.handleUpgrade(request, socket, head, socket => {
     socket.id = request.headers['sec-websocket-key'];
