@@ -120,7 +120,7 @@ server.listen(PORT, () => {
   console.log(`Server listening on http://localhost:${PORT}/`);
 }).on('upgrade', (request, socket, head) => {
   wsServer.handleUpgrade(request, socket, head, socket => {
-    socket.id = request.socket.remoteAddress;
+    socket.id = request.headers['sec-websocket-key'];
     wsServer.emit('connection', socket, request);
   });
 });
