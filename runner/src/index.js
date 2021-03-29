@@ -6,7 +6,8 @@ const WebSocket = require('ws');
 const monitor = require('node-docker-monitor');
 const { exit } = require('process');
 let ws = null;
-const imageName = process.env.WATCHER_IMAGE || 'watcher';
+const IMAGE_NAME = process.env.WATCHER_IMAGE || 'watcher';
+const LIVETL_API_KEY = process.env.LIVETL_API_KEY || 'KEY_WAS_BAD';
 
 let playing = {};
 let shutdown = false;
@@ -16,8 +17,9 @@ function play(data){
     `docker run -d --rm \\
       --workdir /usr/src/watcher \\
       -e VIDEO=${data.streamId} \\
+      -e LIVETL_API_KEY='${LIVETL_API_KEY}' \\
       --name ${data.streamId} \\
-      ${imageName}`
+      ${IMAGE_NAME}`
   ).stdout.pipe(process.stdout);
   console.log(`Starting ${data.streamId} if not already playing`);
 }
@@ -30,7 +32,7 @@ function connect () {
 
     monitor({
       onContainerUp: (container) => {
-        if (!shutdown && container.Image === imageName && !playing[container.Name]) {
+        if (!shutdown && container.Image === IMAGE_NAME && !playing[container.Name]) {
           ws.send(JSON.stringify({
             event: 'status',
             playing: true,
@@ -42,7 +44,7 @@ function connect () {
       },
     
       onContainerDown: (container) => {
-        if (!shutdown && container.Image === imageName && playing[container.Name]) {
+        if (!shutdown && container.Image === IMAGE_NAME && playing[container.Name]) {
           ws.send(JSON.stringify({
             event: 'status',
             playing: false,
@@ -81,7 +83,7 @@ console.log(`Runner started, connecting to ${ENDPOINT}`);
 function exitHandler() {
   shutdown = true;
   console.log('Cleaning up before exit...');
-  exec(`docker rm $(docker stop $(docker ps -a -q --filter ancestor=${imageName} --format="{{.ID}}"))`)
+  exec(`docker rm $(docker stop $(docker ps -a -q --filter ancestor=${IMAGE_NAME} --format="{{.ID}}"))`)
     .stdout.pipe(process.stdout);
   exit(0);
 }
