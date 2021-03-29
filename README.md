@@ -2,6 +2,22 @@
 
 ## Usage
 
+### Configure a `.env` file
+```env
+LIVETL_API_KEY=
+CONTROLLER_URL=
+WATCHER_IMAGE=watcher
+MAX_CONTAINERS=2
+CHROME_REFRESH=10
+```
+
+### Run the pre-built image
+```bash
+docker run -v /var/run/docker.sock:/var/run/docker.sock --env-file .env ghcr.io/livetl/runner
+```
+
+## Development
+
 #### Requirements
 * `docker`
 * `docker-compose`
@@ -14,21 +30,7 @@
 git clone https://github.com/LiveTL/Kanatran
 ```
 
-Create a `.env` file with the following:
-```env
-LIVETL_API_KEY='api key here'
-CONTROLLER_URL='controller url here'
-WATCHER_IMAGE='watcher image name here (probably ghcr.io/livetl/watcher:latest or just watcher)'
-MAX_CONTAINERS='number of max containers here'
-```
-
 ### Dev Info
-
-If the translations stall for periods, adjust the chrome refresh interval (in minutes).
-
-```env
-CHROME_REFRESH='5'
-```
 
 #### Commands
 * `make init`: Initialize the controller server
