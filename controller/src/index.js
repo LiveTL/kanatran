@@ -58,6 +58,7 @@ function runQueue() {
         id: item,
         streamId: queue.top.data
       }));
+      sockets[item].runningContainers[queue.top.data] = false;
       console.log(`Requesting to play ${queue.top.data} on ${item}`);
       queue.pop();
     } else {
