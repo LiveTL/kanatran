@@ -47,6 +47,7 @@ function runQueue() {
       const candidate = Object.keys(sockets[id].runningContainers).length;
       const current = Object.keys(sockets[item].runningContainers).length;
       if (item == null || 
+          candidate < sockets[id].maxContainers && 
           candidate / sockets[id].maxContainers <
           current / sockets[item].maxContainers) {
         item = id;
