@@ -6,3 +6,4 @@ drivers/
 *.log
 bruh.txt
 .env
+sockets.txt

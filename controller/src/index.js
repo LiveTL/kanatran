@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 let sockets = {};
 
 function updateLog() {
-  fs.writeFile('sockets.log', JSON.stringify(sockets, 
+  fs.writeFile('sockets.txt', JSON.stringify(sockets, 
     (key, val) => key == 'socket' ? undefined : val, 2), () => {}); 
 }
 
@@ -40,15 +40,15 @@ const queue = new Queue();
 
 function runQueue() {
   console.log(`Attempting to assign ${queue.length} streams`);
-  if (queue.length) {
+  while (queue.length) {
     const allKeys = Object.keys(sockets);
-    let item = allKeys[0];
+    let item = null;
     allKeys.forEach(id => {
       const candidate = Object.keys(sockets[id].runningContainers).length;
-      const current = Object.keys(sockets[item].runningContainers).length;
-      if (item == null || 
+      const current = item ? Object.keys(sockets[item].runningContainers).length : 0;
+      if (candidate < sockets[id].maxContainers && (item == null || 
           candidate / sockets[id].maxContainers <
-          current / sockets[item].maxContainers) {
+          current / sockets[item].maxContainers)) {
         item = id;
       }
     });
@@ -58,10 +58,12 @@ function runQueue() {
         id: item,
         streamId: queue.top.data
       }));
+      sockets[item].runningContainers[queue.top.data] = false;
       console.log(`Requesting to play ${queue.top.data} on ${item}`);
       queue.pop();
     } else {
       console.log('No machines currently available');
+      break;
     }
   }
   updateLog();
