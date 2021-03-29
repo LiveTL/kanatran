@@ -35,12 +35,14 @@ const queue = new Queue();
 function runQueue() {
   console.log(`Attempting to assign ${queue.length} streams`);
   if (!queue.length) return;
-  let item = null;
-  Object.keys(sockets).forEach(id => {
-    const numRunning = Object.keys(sockets[id].runningContainers).length;
+  const allKeys = Object.keys(sockets);
+  let item = allKeys[0];
+  allKeys.forEach(id => {
+    const candidate = Object.keys(sockets[id].runningContainers).length;
+    const current = Object.keys(sockets[item].runningContainers).length;
     if (item == null || 
-        numRunning / sockets[id].maxContainers <
-        numRunning / sockets[item].maxContainers) {
+        candidate / sockets[id].maxContainers <
+        current / sockets[item].maxContainers) {
       item = id;
     }
   });
