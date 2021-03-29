@@ -32,6 +32,7 @@
 * `make`
 * `npm`
 * `node`
+* `python`
 
 ### Setup
 ```bash
