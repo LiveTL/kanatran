@@ -20,9 +20,9 @@
     CHROME_REFRESH=10
     ```
 1.  Run the pre-built image
-```bash
-docker run -v /var/run/docker.sock:/var/run/docker.sock --env-file .env ghcr.io/livetl/runner
-```
+    ```bash
+    docker run -v /var/run/docker.sock:/var/run/docker.sock --env-file .env ghcr.io/livetl/runner
+    ```
 
 ## Development
 
