@@ -18,7 +18,6 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from models import ClientError, Log, Timestamp
 from pyvirtualdisplay import Display
-from transcribe import aio_write_transcripts
 from workers import WebSpeechSlave
 from yt import YTLiveService, get_timestamp
 
