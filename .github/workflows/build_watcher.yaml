@@ -1,6 +1,10 @@
 name: Build Watcher
 
-on: workflow_dispatch
+on:
+  push:
+    branches:
+      - master
+    workflow_dispatch:
 
 jobs:
   build_watcher:
