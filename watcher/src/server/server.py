@@ -11,7 +11,7 @@ from fastapi.staticfiles import StaticFiles
 from models import ClientError, Log, Timestamp
 from pyvirtualdisplay import Display
 from workers import WebSpeechSlave
-from yt import YTLiveService, get_timestamp
+from yt import get_timestamp
 
 static = Path(__file__).resolve().parent / "../public"
 
