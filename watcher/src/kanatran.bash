@@ -39,7 +39,7 @@ function playvid() {
 }
 
 function server() {
-	python3.8 -m uvicorn --app-dir=server server:app --port=42069 --log-level="error"
+	python3.8 -m uvicorn --app-dir=server server:app --port=42069
 }
 
 # python3.8 -m pip install -r server/requirements.txt

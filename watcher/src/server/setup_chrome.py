@@ -1,4 +1,3 @@
-from autoselenium import chrome, firefox
+from autoselenium import chrome
 
 chrome.setup_driver()
-firefox.setup_driver()
