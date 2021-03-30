@@ -1,3 +1,5 @@
+const clientVersion = '1.0.0';
+
 require('../../common/logs.js');
 
 const {exec} = require('child_process');
@@ -29,7 +31,7 @@ function play(data){
 const MAX_CONTAINERS = parseInt(process.env.MAX_CONTAINERS || 2);
 let dockerMonitor = null;
 function connect () {
-  ws = new WebSocket(ENDPOINT);
+  ws = new WebSocket(ENDPOINT, clientVersion);
   ws.on('open', () => {
     console.log('Runner is active!');
 
@@ -85,9 +87,14 @@ function connect () {
     }
     }
   });
-  ws.on('close', () => {
-    console.log('Socket disconnected. Retrying...');
-    setTimeout(connect, 2500);
+  ws.on('close', (code, reason) => {
+    if (code === 4269) {
+      console.log(reason);
+      exit(0);
+    } else {
+      console.log('Socket disconnected. Retrying...');
+      setTimeout(connect, 2500);
+    }
   });
   ws.on('error', console.log);
 }
