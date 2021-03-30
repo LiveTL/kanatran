@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from pydantic import BaseModel
 
 
@@ -12,5 +10,4 @@ class ClientError(BaseModel):
 
 
 class Timestamp(BaseModel):
-    duration: Optional[int]
-    epoch: Optional[int]
+    current: int
