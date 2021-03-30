@@ -86,7 +86,7 @@ fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
 let env = {};
 fetch('/env').then(r => r.json()).then(r => {
   env = r;
-  API = env.LIVETL_API_URL || API;
+  API = env.API_URL || API;
   openConnection();
 });
 

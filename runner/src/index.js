@@ -8,7 +8,7 @@ const { exit } = require('process');
 let ws = null;
 const IMAGE_NAME = process.env.WATCHER_IMAGE || 'watcher';
 const LIVETL_API_KEY = process.env.LIVETL_API_KEY || 'KEY_WAS_BAD';
-const LIVETL_API_URL = process.env.LIVETL_API_URL || 'https://api.livetl.app';
+const API_URL = process.env.API_URL || 'https://api.livetl.app';
 
 let playing = {};
 let shutdown = false;
@@ -19,7 +19,7 @@ function play(data){
       --workdir /usr/src/watcher \\
       -e VIDEO=${data.streamId} \\
       -e LIVETL_API_KEY='${LIVETL_API_KEY}' \\
-      -e LIVETL_API_URL=${LIVETL_API_URL} \\
+      -e API_URL=${API_URL} \\
       --name ${data.streamId} \\
       ${IMAGE_NAME}`
   ).stdout.pipe(process.stdout);

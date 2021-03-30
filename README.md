@@ -18,7 +18,7 @@
     WATCHER_IMAGE=ghcr.io/livetl/watcher
     MAX_CONTAINERS=2
     CHROME_REFRESH=10
-    LIVETL_API_URL=https://api.livetl.app
+    API_URL=https://api.livetl.app
     ```
 1.  Run the pre-built image
     ```bash
