@@ -104,9 +104,8 @@ console.log(`Runner started, connecting to ${ENDPOINT}`);
 function exitHandler() {
   shutdown = true;
   console.log('Cleaning up before exit...');
-  exec(`docker rm $(docker stop $(docker ps -a -q --filter ancestor=${IMAGE_NAME} --format="{{.ID}}"))`)
+  exec(`docker rm $(docker kill $(docker ps -a -q --filter ancestor=${IMAGE_NAME} --format="{{.ID}}"))`, () => exit(0))
     .stdout.pipe(process.stdout);
-  exit(0);
 }
 
 process.on('exit', exitHandler);
