@@ -8,6 +8,7 @@ const app = express();
 const server = require('http').createServer(app);
 const ws = require('ws');
 const fs = require('fs');
+const { validateVersion } = require('./versionValidation.js');
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
@@ -137,6 +138,10 @@ server.listen(PORT, () => {
   updateLog();
 }).on('upgrade', (request, socket, head) => {
   wsServer.handleUpgrade(request, socket, head, socket => {
+    if (!validateVersion(request.headers['sec-websocket-protocol'])) {
+      socket.close(4269, 'Runner version is incompatible with controller');
+      return;
+    }
     socket.id = request.headers['sec-websocket-key'];
     wsServer.emit('connection', socket, request);
   });

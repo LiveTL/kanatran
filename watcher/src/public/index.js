@@ -77,16 +77,15 @@ recognition.onstart = () => {
   console.debug('Recognition started');
 };
 
-// FIXME actually get the beginning timestamp since 6969 is depreciated
 let begin = new Date().getTime();
-fetch('http://localhost:6969/timestamp').then(d => d.json()).then(d => {
-  begin = d.epoch;
+fetch('/timestamp').then(d => d.json()).then(d => {
+  begin -= d.current * 1000;
 });
 
 let env = {};
 fetch('/env').then(r => r.json()).then(r => {
   env = r;
-  API = env.LIVETL_API_URL || API;
+  API = env.API_URL || API;
   openConnection();
 });
 
