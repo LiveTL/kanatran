@@ -1,5 +1,7 @@
 import asyncio
 import os
+import sys
+from multiprocessing import Process
 from pathlib import Path
 from pprint import pprint
 from threading import Thread
@@ -32,6 +34,12 @@ display.start()
 # print("Using ch", os.environ.get("CHANNEL_ID"))
 # ytl = YTLiveService(os.environ.get("CHANNEL_ID", "UCZlDXzGoo7d44bwdNObFacg"))
 
+old_print = print
+
+# TODO Figure out a less jank way to control uvicorn's logging
+def print(*args, sep=" ", end="\n", **kwargs):
+    pstr = sep.join(args) + end
+    Process(target=old_print, args=(pstr,)).start()
 
 async def get_video_id() -> Optional[str]:
     return os.environ.get("VIDEO")
@@ -47,7 +55,7 @@ async def timestamp():
 
 @app.post("/error")
 async def error(err: ClientError):
-    print("Got error message:", err.message)
+    print("/error", err.message, file=sys.stderr)
     return 200
 
 
@@ -60,7 +68,7 @@ async def refresh():
 
 @app.post("/logs")
 async def transcript_event(log: Log):
-    print(log.text)
+    print("/logs", log.text, file=sys.stderr)
     return 200
 
 
