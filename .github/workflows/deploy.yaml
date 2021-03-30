@@ -15,3 +15,15 @@ jobs:
           from_branch: develop
           target_branch: master
           github_token: ${{ github.token }}
+
+      - name: Dispatch Runner Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Build Runner
+          token: ${{ secrets.DISPATCH_KEY }}
+
+      - name: Dispatch Watcher Build
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: Build Watcher
+          token: ${{ secrets.DISPATCH_KEY }}
