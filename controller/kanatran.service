@@ -1,0 +1,14 @@
+[Unit]
+Description=LiveTL Kanatran Controller Service
+
+[Service]
+WorkingDirectory=/opt/kanatran/
+ExecStart=/usr/bin/node /opt/kanatran/src/index.js
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=Kanatran
+User=livetl
+
+[Install]
+WantedBy=multi-user.target
