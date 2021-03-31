@@ -63,6 +63,7 @@ function play(data) {
       ws.send(JSON.stringify({
         event: 'status',
         playing: true,
+        alreadyPlaying: true,
         video: data.streamId
       }));
       console.log(`${data.streamId} is already playing`);
@@ -120,6 +121,7 @@ function connect () {
         ws.send(JSON.stringify({
           event: 'status',
           playing: true,
+          alreadyPlaying: true,
           video
         }));
         console.log(`Established that ${video} is still running`);

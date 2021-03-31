@@ -129,8 +129,11 @@ wsServer.on('connection', (socket) => {
     case 'status': {
       if (data.playing) {
         sockets[socket.id].runningContainers[data.video] = true;
-        console.log(`${data.video} is playing on ${socket.id}`);
-        setTimeout(() => sockets[socket.id].locked = false, 7500);
+        console.log(
+          `${data.video} is ${data.alreadyPlaying ? 'already ' : ''}playing on ${socket.id}`
+        );
+        setTimeout(() => sockets[socket.id].locked = false, 
+          data.alreadyPlaying ? 0 : 7500);
       } else {
         if (sockets[socket.id]) {
           delete sockets[socket.id].runningContainers[data.video];
