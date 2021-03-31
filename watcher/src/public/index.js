@@ -168,7 +168,7 @@ const send = async (text, translation) => {
           translation,
           start: time / 1000
         })
-      }).then(async result=>{
+      })/*.then(async result=>{
         fetch('/logs', {
           method: 'POST',
           headers: {
@@ -179,18 +179,18 @@ const send = async (text, translation) => {
             text: await result.text()
           })
         });
-      }).catch(error => {
-        fetch('/logs', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            text: error.toString()
-          })
+      })*/.catch(error => {
+          fetch('/logs', {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              text: error.toString()
+            })
+          });
         });
-      });
     }
   }
 };
