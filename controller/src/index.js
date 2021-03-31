@@ -1,5 +1,3 @@
-require('../../common/logs.js');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const { exec } = require('child_process');
@@ -9,6 +7,9 @@ const server = require('http').createServer(app);
 const ws = require('ws');
 const fs = require('fs');
 const { validateVersion } = require('./versionValidation.js');
+
+const log = console.log;
+console.log = (...args) => log(new Date(), ...args);
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
