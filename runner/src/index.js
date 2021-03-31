@@ -1,7 +1,5 @@
 const clientVersion = '1.0.0';
 
-require('../../common/logs.js');
-
 const {exec} = require('child_process');
 const ENDPOINT = process.env.CONTROLLER_URL || 'ws://localhost:8000';
 const WebSocket = require('ws');
@@ -11,6 +9,9 @@ let ws = null;
 const IMAGE_NAME = process.env.WATCHER_IMAGE || 'watcher';
 const LIVETL_API_KEY = process.env.LIVETL_API_KEY || 'KEY_WAS_BAD';
 const API_URL = process.env.API_URL || 'https://api.livetl.app';
+
+const log = console.log;
+console.log = (...args) => log(new Date(), ...args);
 
 let playing = {};
 let shutdown = false;

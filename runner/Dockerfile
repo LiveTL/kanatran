@@ -7,7 +7,6 @@ RUN apk update && apk add --no-cache docker-cli
 ADD runner/src /usr/src/runner
 ADD runner/package.json /usr/src/runner/package.json
 ADD runner/package-lock.json /usr/src/runner/package-lock.json
-ADD common /usr/common
 WORKDIR /usr/src/runner
 RUN npm install
 
