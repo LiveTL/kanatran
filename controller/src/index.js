@@ -7,19 +7,24 @@ const server = require('http').createServer(app);
 const ws = require('ws');
 const fs = require('fs');
 const { validateVersion } = require('./versionValidation.js');
+const IS_PRODUCTION = process.env.IS_PRODUCTION;
 
 const log = console.log;
-console.log = (...args) => log(new Date(), ...args);
+console.log = (...args) => { if (!IS_PRODUCTION) log(new Date(), ...args); };
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
 
 let sockets = {};
 
-function updateLog() {
-  fs.writeFile('sockets.txt', JSON.stringify(sockets, 
-    (key, val) => key == 'socket' ? undefined : val, 2), () => {}); 
+function updateLog(override) {
+  if (IS_PRODUCTION && !override) return;
+  const data = JSON.stringify(sockets, 
+    (key, val) => key == 'socket' ? undefined : val, 2);
+  fs.writeFile('sockets.txt', data, () => {}); 
 }
+
+if (IS_PRODUCTION) setInterval(() => updateLog(true), 30);
 
 app.get('/', (req, res) => {
   res.send(`
@@ -34,23 +39,46 @@ await fetch('/stream', {
     streamId: 'xHP6lpOepk4'
   })
 });
+
+await fetch('/stream', {
+  method: 'post',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    streamId: '1aQChs0biE8'
+  })
+});
+
+for (let i=0;i<100;i++){
+  await fetch('/stream', {
+    method: 'post',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      streamId: 'abcde' + i
+    })
+  });
+}
 </pre>
   `);
 });
 
 const queue = new Queue();
 
+setInterval(runQueue, 2500);
+
 function runQueue() {
-  console.log(`Attempting to assign ${queue.length} streams`);
+  if (queue.length) console.log(`Attempting to assign ${queue.length} streams`);
   while (queue.length) {
     const allKeys = Object.keys(sockets);
     let item = null;
     allKeys.forEach(id => {
-      const candidate = Object.keys(sockets[id].runningContainers).length;
-      const current = item ? Object.keys(sockets[item].runningContainers).length : 0;
-      if (candidate < sockets[id].maxContainers && (item == null || 
-          candidate / sockets[id].maxContainers <
-          current / sockets[item].maxContainers)) {
+      if (!sockets[id].locked && sockets[id].relativeLoad <= 100 &&
+          (item == null || sockets[id].relativeLoad < sockets[item].sockets[id].relativeLoad)) {
         item = id;
       }
     });
@@ -62,6 +90,7 @@ function runQueue() {
       }));
       sockets[item].runningContainers[queue.top.data] = false;
       console.log(`Requesting to play ${queue.top.data} on ${item}`);
+      sockets[item].locked = true;
       queue.pop();
     } else {
       console.log('No machines currently available');
@@ -74,7 +103,6 @@ function runQueue() {
 app.post('/stream', (req, res) => {
   queue.push(req.body.streamId);
   console.log(`Queued ${req.body.streamId} (priority: ${queue.length})`);
-  runQueue();
   res.status(200);
   res.end();
 });
@@ -101,23 +129,30 @@ wsServer.on('connection', (socket) => {
     case 'status': {
       if (data.playing) {
         sockets[socket.id].runningContainers[data.video] = true;
-        console.log(`${data.video} is playing on ${socket.id}`);
+        console.log(
+          `${data.video} is ${data.alreadyPlaying ? 'already ' : ''}playing on ${socket.id}`
+        );
+        setTimeout(() => sockets[socket.id].locked = false, 
+          data.alreadyPlaying ? 0 : 7500);
       } else {
         if (sockets[socket.id]) {
           delete sockets[socket.id].runningContainers[data.video];
         }
         console.log(`Finished playing ${data.video} on ${socket.id}`);
       }
-      runQueue();
       break;
-    } case 'info':{
-      sockets[socket.id].maxContainers = data.maxContainers;
+    } case 'startinit': {
+      sockets[socket.id].relativeLoad = 0.0;
+      sockets[socket.id].locked = false;
       sockets[socket.id].runningContainers = {};
       console.log(`Initialized ${socket.id} limits`);
-      runQueue();
       socket.send(JSON.stringify({
         event: 'initdone'
       }));
+      break;
+    } case 'usage': {
+      sockets[socket.id].relativeLoad = data.relativeLoad;
+      updateLog();
       break;
     }
     }
@@ -130,7 +165,6 @@ wsServer.on('connection', (socket) => {
       });
       delete sockets[socket.id];
     }
-    runQueue();
   });
 });
 

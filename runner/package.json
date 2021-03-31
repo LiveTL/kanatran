@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "dockerstats": "^2.2.0",
     "node-docker-monitor": "^1.0.11",
     "tar-fs": "^2.1.1",
     "ws": "^7.4.4"
