@@ -50,3 +50,6 @@ Make sure to replace your `WATCHER_IMAGE` in `.env` with `watcher` to use your d
 * `make start`: Start the controller server
 * `make run`: Run the local runner
 * `make spawn video={video id}`: Start a translation container
+
+#### Environment Variables
+* `MODE`: `production` or `development` for the controller

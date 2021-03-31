@@ -7,7 +7,7 @@ const server = require('http').createServer(app);
 const ws = require('ws');
 const fs = require('fs');
 const { validateVersion } = require('./versionValidation.js');
-const IS_PRODUCTION = process.env.IS_PRODUCTION;
+const IS_PRODUCTION = (process.env.MODE || 'development').toLowerCase() === 'production';
 
 const log = console.log;
 console.log = (...args) => { if (!IS_PRODUCTION) log(new Date(), ...args); };
