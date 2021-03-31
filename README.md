@@ -12,13 +12,14 @@
     docker pull ghcr.io/livetl/runner:latest
     ```
 1. Configure a `.env` file
-    ```env
-    LIVETL_API_KEY=
-    CONTROLLER_URL=
-    WATCHER_IMAGE=ghcr.io/livetl/watcher
-    MAX_CONTAINERS=2
-    CHROME_REFRESH=10
-    API_URL=https://api.livetl.app
+    ```bash
+    LIVETL_API_KEY= # livetl api key
+    CONTROLLER_URL= # controller address
+    WATCHER_IMAGE=ghcr.io/livetl/watcher # watcher image
+    CHROME_REFRESH=10 # refresh interval (should be 10)
+    API_URL=https://api.livetl.app # api url
+    MAX_CPU_PERCENT=100 # max cpu usage at which container can start
+    MAX_MEM_PERCENT=100 # max mem usage at which container can start
     ```
 1.  Run the pre-built image
     ```bash

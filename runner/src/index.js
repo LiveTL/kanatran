@@ -1,6 +1,7 @@
-const clientVersion = '1.0.0';
+const clientVersion = '1.1.0';
 
 const {exec} = require('child_process');
+const dockerstats = require('dockerstats');
 const ENDPOINT = process.env.CONTROLLER_URL || 'ws://localhost:8000';
 const WebSocket = require('ws');
 const monitor = require('node-docker-monitor');
@@ -9,6 +10,11 @@ let ws = null;
 const IMAGE_NAME = process.env.WATCHER_IMAGE || 'watcher';
 const LIVETL_API_KEY = process.env.LIVETL_API_KEY || 'KEY_WAS_BAD';
 const API_URL = process.env.API_URL || 'https://api.livetl.app';
+let initDone = false;
+let MAX_USAGES = {
+  cpuPercent: process.env.MAX_CPU_PERCENT || 50,
+  memPercent: process.env.MAX_MEM_PERCENT || 50
+};
 
 const log = console.log;
 console.log = (...args) => log(new Date(), ...args);
@@ -16,8 +22,33 @@ console.log = (...args) => log(new Date(), ...args);
 let playing = {};
 let shutdown = false;
 
-function play(data){
-  exec(
+setInterval(statsGetter, 1000);
+async function statsGetter() {
+  if (ws && initDone) {
+    const stats = await dockerstats.dockerContainerStats();
+    let usages = {
+      memPercent: 0,
+      cpuPercent: 0
+    };
+    stats.forEach(container => {
+      usages.memPercent += container.memPercent;
+      usages.cpuPercent += container.cpuPercent;
+    });
+    let relativeLoad = 0.0;
+    Object.keys(usages).forEach(metric => {
+      usages[metric] /= MAX_USAGES[metric];
+      relativeLoad = Math.max(Math.round(usages[metric] * 10000) / 100, relativeLoad);
+    });
+    ws.send(JSON.stringify({
+      event: 'usage',
+      relativeLoads: usages,
+      relativeLoad
+    }));
+  }
+}
+
+function play(data) {
+  const process = exec(
     `docker run -d --rm \\
       --workdir /usr/src/watcher \\
       -e VIDEO=${data.streamId} \\
@@ -25,11 +56,21 @@ function play(data){
       -e API_URL=${API_URL} \\
       --name ${data.streamId} \\
       ${IMAGE_NAME}`
-  ).stdout.pipe(process.stdout);
-  console.log(`Starting ${data.streamId} if not already playing`);
+  );
+  // process.stdout.pipe(process.stdout);
+  process.stderr.on('data', output => {
+    if (output.toString().includes('already in use by container')) {
+      ws.send(JSON.stringify({
+        event: 'status',
+        playing: true,
+        video: data.streamId
+      }));
+      console.log(`${data.streamId} is already playing`);
+    }
+  });
+  console.log(`Starting ${data.streamId}`);
 }
 
-const MAX_CONTAINERS = parseInt(process.env.MAX_CONTAINERS || 2);
 let dockerMonitor = null;
 function connect () {
   ws = new WebSocket(ENDPOINT, clientVersion);
@@ -38,7 +79,7 @@ function connect () {
 
     if (!dockerMonitor) monitor({
       onContainerUp: (container) => {
-        if (!shutdown && container.Image === IMAGE_NAME && !playing[container.Name]) {
+        if (initDone && !shutdown && container.Image === IMAGE_NAME && !playing[container.Name]) {
           ws.send(JSON.stringify({
             event: 'status',
             playing: true,
@@ -50,7 +91,7 @@ function connect () {
       },
     
       onContainerDown: (container) => {
-        if (!shutdown && container.Image === IMAGE_NAME && playing[container.Name]) {
+        if (initDone && !shutdown && container.Image === IMAGE_NAME && playing[container.Name]) {
           ws.send(JSON.stringify({
             event: 'status',
             playing: false,
@@ -68,8 +109,7 @@ function connect () {
     case 'socketid': {
       console.log(`ID is ${data.id}`);
       ws.send(JSON.stringify({
-        event: 'info',
-        maxContainers: MAX_CONTAINERS
+        event: 'startinit'
       }));
       break;
     } case 'play': {
@@ -84,6 +124,7 @@ function connect () {
         }));
         console.log(`Established that ${video} is still running`);
       });
+      initDone = true;
       break;
     }
     }
@@ -115,4 +156,4 @@ process.on('SIGUSR1', exitHandler);
 process.on('SIGUSR2', exitHandler);
 process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
-process.on('uncaughtException', exitHandler);
+// process.on('uncaughtException', exitHandler);
