@@ -1,0 +1,17 @@
+<pre id="pre">
+send('video id here');
+</pre>
+<script>
+  function send(id) {
+    return fetch('/stream', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        streamId: id
+      })
+    });
+  }
+</script>

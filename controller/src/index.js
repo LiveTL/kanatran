@@ -14,6 +14,7 @@ console.log = (...args) => { if (!IS_PRODUCTION) log(new Date(), ...args); };
 
 const PORT = process.env.PORT || 8000;
 app.use(bodyParser.json());
+app.use(express.static('public'));
 
 let sockets = {};
 
@@ -25,47 +26,6 @@ function updateLog(override) {
 }
 
 if (IS_PRODUCTION) setInterval(() => updateLog(true), 30);
-
-app.get('/', (req, res) => {
-  res.send(`
-<pre>
-await fetch('/stream', {
-  method: 'post',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    streamId: 'xHP6lpOepk4'
-  })
-});
-
-await fetch('/stream', {
-  method: 'post',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    streamId: '1aQChs0biE8'
-  })
-});
-
-for (let i=0;i<100;i++){
-  await fetch('/stream', {
-    method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      streamId: 'abcde' + i
-    })
-  });
-}
-</pre>
-  `);
-});
 
 const queue = new Queue();
 
