@@ -61,9 +61,14 @@ function runQueue() {
 }
 
 app.post('/stream', (req, res) => {
-  queue.push(req.body.streamId);
-  console.log(`Queued ${req.body.streamId} (priority: ${queue.length})`);
-  res.status(200);
+  if (typeof req.body.streamId === 'string' && 
+      req.body.streamId.indexOf(' ') >= 0) {
+    res.status(400);
+  } else {
+    queue.push(req.body.streamId);
+    console.log(`Queued ${req.body.streamId} (priority: ${queue.length})`);
+    res.status(200);
+  }
   res.end();
 });
 app.post('/github', (req, res) => {
