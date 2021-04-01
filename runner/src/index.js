@@ -26,6 +26,13 @@ let shutdown = false;
 
 const round = num => Math.round(num * 10000) / 100;
 
+function sendStats(relativeLoad) {
+  ws.send(JSON.stringify({
+    event: 'usage',
+    relativeLoad
+  }));
+}
+
 setInterval(statsGetter, 1000);
 async function statsGetter() {
   if (ws && initDone) {
@@ -49,12 +56,8 @@ async function statsGetter() {
       usages.cpuPercent
     );
 
-    if (initDone) {
-      ws.send(JSON.stringify({
-        event: 'usage',
-        relativeLoad
-      }));
-    }
+    if (initDone)
+      sendStats(relativeLoad);
   }
 }
 
@@ -129,6 +132,7 @@ function connect () {
       play(data);
       break;
     } case 'initdone': {
+      sendStats(0);
       Object.keys(playing).forEach(video => {
         ws.send(JSON.stringify({
           event: 'status',
