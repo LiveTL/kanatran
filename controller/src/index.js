@@ -50,7 +50,7 @@ function runQueue() {
       }));
       sockets[item].runningContainers[queue.top.data] = false;
       console.log(`Requesting to play ${queue.top.data} on ${item}`);
-      sockets[item].locked = true;
+      // sockets[item].locked = true;
       queue.pop();
     } else {
       console.log('No machines currently available');
@@ -97,8 +97,8 @@ wsServer.on('connection', (socket) => {
         console.log(
           `${data.video} is ${data.alreadyPlaying ? 'already ' : ''}playing on ${socket.id}`
         );
-        setTimeout(() => sockets[socket.id].locked = false, 
-          data.alreadyPlaying ? 0 : 7500);
+        // setTimeout(() => sockets[socket.id].locked = false, 
+        //   data.alreadyPlaying ? 0 : 7500);
       } else {
         if (sockets[socket.id]) {
           delete sockets[socket.id].runningContainers[data.video];
