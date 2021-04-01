@@ -48,10 +48,13 @@ async function statsGetter() {
       usages.memPercent,
       usages.cpuPercent
     );
-    ws.send(JSON.stringify({
-      event: 'usage',
-      relativeLoad
-    }));
+
+    if (initDone) {
+      ws.send(JSON.stringify({
+        event: 'usage',
+        relativeLoad
+      }));
+    }
   }
 }
 
@@ -99,7 +102,7 @@ function connect () {
           playing[container.Name] = true;
         }
       },
-    
+
       onContainerDown: (container) => {
         if (initDone && !shutdown && container.Image === IMAGE_NAME && playing[container.Name]) {
           ws.send(JSON.stringify({
