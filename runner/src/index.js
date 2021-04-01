@@ -5,16 +5,18 @@ const dockerstats = require('dockerstats');
 const ENDPOINT = process.env.CONTROLLER_URL || 'ws://localhost:8000';
 const WebSocket = require('ws');
 const monitor = require('node-docker-monitor');
+const bytes = require('bytes');
 const { exit } = require('process');
 let ws = null;
 const IMAGE_NAME = process.env.WATCHER_IMAGE || 'watcher';
 const LIVETL_API_KEY = process.env.LIVETL_API_KEY || 'KEY_WAS_BAD';
 const API_URL = process.env.API_URL || 'https://api.livetl.app';
 let initDone = false;
-let MAX_USAGES = {
-  cpuPercent: process.env.MAX_CPU_PERCENT || 50,
-  memPercent: process.env.MAX_MEM_PERCENT || 50
-};
+let MAX_MEM_VAR = process.env.MAX_MEM || '100';
+const MEM_IS_BYTES = MAX_MEM_VAR.toLowerCase().endsWith('b');
+if (MEM_IS_BYTES) MAX_MEM_VAR = bytes(MAX_MEM_VAR);
+else MAX_MEM_VAR = parseInt(MAX_MEM_VAR);
+const MAX_CPU = parseInt(process.env.MAX_CPU || '') || 100;
 
 const log = console.log;
 console.log = (...args) => log(new Date(), ...args);
@@ -22,26 +24,32 @@ console.log = (...args) => log(new Date(), ...args);
 let playing = {};
 let shutdown = false;
 
+const round = num => Math.round(num * 10000) / 100;
+
 setInterval(statsGetter, 1000);
 async function statsGetter() {
   if (ws && initDone) {
     const stats = await dockerstats.dockerContainerStats();
     let usages = {
       memPercent: 0,
+      totalMem: 0,
       cpuPercent: 0
     };
     stats.forEach(container => {
       usages.memPercent += container.memPercent;
+      usages.totalMem += container.memUsage;
       usages.cpuPercent += container.cpuPercent;
     });
-    let relativeLoad = 0.0;
-    Object.keys(usages).forEach(metric => {
-      usages[metric] /= MAX_USAGES[metric];
-      relativeLoad = Math.max(Math.round(usages[metric] * 10000) / 100, relativeLoad);
-    });
+    if (MEM_IS_BYTES) usages.memPercent = usages.totalMem / MAX_MEM_VAR;
+    else usages.memPercent /= MAX_MEM_VAR;
+    usages.memPercent = round(usages.memPercent / 100);
+    usages.cpuPercent = round(usages.cpuPercent / MAX_CPU);
+    let relativeLoad = Math.max(
+      usages.memPercent,
+      usages.cpuPercent
+    );
     ws.send(JSON.stringify({
       event: 'usage',
-      relativeLoads: usages,
       relativeLoad
     }));
   }
@@ -76,6 +84,7 @@ let dockerMonitor = null;
 function connect () {
   ws = new WebSocket(ENDPOINT, clientVersion);
   ws.on('open', () => {
+    initDone = false;
     console.log('Runner is active!');
 
     if (!dockerMonitor) monitor({

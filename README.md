@@ -16,10 +16,9 @@
     LIVETL_API_KEY= # livetl api key
     CONTROLLER_URL= # controller address
     WATCHER_IMAGE=ghcr.io/livetl/watcher # watcher image
-    CHROME_REFRESH=10 # refresh interval (should be 10)
     API_URL=https://api.livetl.app # api url
-    MAX_CPU_PERCENT=100 # max cpu usage at which container can start
-    MAX_MEM_PERCENT=100 # max mem usage at which container can start
+    MAX_CPU=100% # max cpu usage at which container can start. (ex. 69%)
+    MAX_MEM=100% # max mem usage at which container can start. can be either % or standard file size notation (ex. 69%, 420MB, 21GB)
     ```
 1.  Run the pre-built image
     ```bash
