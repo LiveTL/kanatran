@@ -26,8 +26,23 @@ let shutdown = false;
 
 const round = num => Math.round(num * 10000) / 100;
 
+let wsQueue = [];
+function send(...args) {
+  if (ws.OPEN && !ws.CONNECTING) ws.send(...args);
+  else wsQueue.push(args);
+}
+
+setInterval(() => {
+  if (ws.OPEN && !ws.CONNECTING) {
+    wsQueue.forEach(item => {
+      ws.send(...item);
+    });
+  }
+  wsQueue = [];
+}, 1000);
+
 function sendStats(relativeLoad) {
-  ws.send(JSON.stringify({
+  send(JSON.stringify({
     event: 'usage',
     relativeLoad
   }));
@@ -74,7 +89,7 @@ function play(data) {
   // process.stdout.pipe(process.stdout);
   process.stderr.on('data', output => {
     if (output.toString().includes('already in use by container')) {
-      ws.send(JSON.stringify({
+      send(JSON.stringify({
         event: 'status',
         playing: true,
         alreadyPlaying: true,
@@ -88,75 +103,79 @@ function play(data) {
 
 let dockerMonitor = null;
 function connect () {
-  ws = new WebSocket(ENDPOINT, clientVersion);
-  ws.on('open', () => {
-    initDone = false;
-    console.log('Runner is active!');
+  try {
+    ws = new WebSocket(ENDPOINT, clientVersion);
+    ws.on('open', () => {
+      initDone = false;
+      console.log('Runner is active!');
 
-    if (!dockerMonitor) monitor({
-      onContainerUp: (container) => {
-        if (initDone && !shutdown && container.Image === IMAGE_NAME && !playing[container.Name]) {
-          ws.send(JSON.stringify({
+      if (!dockerMonitor) monitor({
+        onContainerUp: (container) => {
+          if (initDone && !shutdown && container.Image === IMAGE_NAME && !playing[container.Name]) {
+            send(JSON.stringify({
+              event: 'status',
+              playing: true,
+              video: container.Name
+            }));
+            console.log(`${container.Name} is playing!`);
+            playing[container.Name] = true;
+          }
+        },
+
+        onContainerDown: (container) => {
+          if (initDone && !shutdown && container.Image === IMAGE_NAME && playing[container.Name]) {
+            send(JSON.stringify({
+              event: 'status',
+              playing: false,
+              video: container.Name
+            }));
+            console.log(`${container.Name} is done`);
+            delete playing[container.Name];
+          }
+        }
+      });
+    });
+    ws.on('message', (data) => {
+      data = JSON.parse(data);
+      switch (data.event){
+      case 'socketid': {
+        console.log(`ID is ${data.id}`);
+        send(JSON.stringify({
+          event: 'startinit'
+        }));
+        break;
+      } case 'play': {
+        play(data);
+        break;
+      } case 'initdone': {
+        sendStats(0);
+        Object.keys(playing).forEach(video => {
+          send(JSON.stringify({
             event: 'status',
             playing: true,
-            video: container.Name
+            alreadyPlaying: true,
+            video
           }));
-          console.log(`${container.Name} is playing!`);
-          playing[container.Name] = true;
-        }
-      },
-
-      onContainerDown: (container) => {
-        if (initDone && !shutdown && container.Image === IMAGE_NAME && playing[container.Name]) {
-          ws.send(JSON.stringify({
-            event: 'status',
-            playing: false,
-            video: container.Name
-          }));
-          console.log(`${container.Name} is done`);
-          delete playing[container.Name];
-        }
+          console.log(`Established that ${video} is still running`);
+        });
+        initDone = true;
+        break;
+      }
       }
     });
-  });
-  ws.on('message', (data) => {
-    data = JSON.parse(data);
-    switch (data.event){
-    case 'socketid': {
-      console.log(`ID is ${data.id}`);
-      ws.send(JSON.stringify({
-        event: 'startinit'
-      }));
-      break;
-    } case 'play': {
-      play(data);
-      break;
-    } case 'initdone': {
-      sendStats(0);
-      Object.keys(playing).forEach(video => {
-        ws.send(JSON.stringify({
-          event: 'status',
-          playing: true,
-          alreadyPlaying: true,
-          video
-        }));
-        console.log(`Established that ${video} is still running`);
-      });
-      initDone = true;
-      break;
-    }
-    }
-  });
-  ws.on('close', (code, reason) => {
-    if (code === 4269) {
-      console.log(reason);
-      exit(0);
-    } else {
-      console.log('Socket disconnected. Retrying...');
-      setTimeout(connect, 2500);
-    }
-  });
-  ws.on('error', console.log);
+    ws.on('close', (code, reason) => {
+      if (code === 4269) {
+        console.log(reason);
+        exit(0);
+      } else {
+        console.log('Socket disconnected. Retrying...');
+        setTimeout(connect, 2500);
+      }
+    });
+    ws.on('error', () => {});
+  // eslint-disable-next-line no-empty
+  } catch (e) {
+  }
 }
 connect();
 console.log(`Runner started, connecting to ${ENDPOINT}`);
