@@ -67,6 +67,19 @@ const logError = (e) => {
   });
 };
 
+const logNormal = data => {
+  fetch('/logs', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      text: data
+    })
+  });
+};
+
 // eslint-disable-next-line no-undef
 googleTranslateElementInit = () => {
   // eslint-disable-next-line no-undef
@@ -115,16 +128,7 @@ function openConnection() {
     }
   }).then(r => r.text()).then(token => {
     sessionToken = token;
-    fetch('/logs', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text: token
-      })
-    });
+    logNormal(token);
     keepAlive();
   });
 }
@@ -133,21 +137,29 @@ function openConnection() {
 function keepAlive() {
   // eslint-disable-next-line no-unused-vars
   const interval = setInterval(async () => {
-    try {
+    const refreshFetch = async () => {
       const response = await fetch(`${API}/session/ping`, {
         method: 'GET',
         headers: {
           'Client-Name': 'Kanatran',
-          'Session-Token': sessionToken
-        }
+          'Session-Token': sessionToken,
+          'Cache-Control': 'no-cache'
+        },
+        cache: 'no-cache'
       });
-      // eslint-disable-next-line no-unused-vars
+        // eslint-disable-next-line no-unused-vars
       const pong = await response.text();
-      // Grumpy said don't worry about processing pong omegalul
-    } catch (e) {
-      logError(e);
-    }
-  }, 450000);
+      logNormal(pong);
+    };
+    const runRefresh = () => {
+      refreshFetch().catch(e => {
+        logError(e);
+        // eslint-disable-next-line no-unused-vars
+        setTimeout(runRefresh, 1000);
+      });
+    };
+    runRefresh();
+  }, 300000);
 }
 // step 3: send to LiveTL api
 // step 4: profit
@@ -157,20 +169,11 @@ const send = async (text, translation) => {
   if (text || translation) {
     console.log(`${text}\n%c${translation}`, 'font-size: x-large');
     // keep this for logging purposes
-    fetch('/logs', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        text: JSON.stringify({
-          timestamp: time / 1000,
-          text,
-          translation
-        })
-      })
-    });
+    logNormal(JSON.stringify({
+      timestamp: time / 1000,
+      text,
+      translation
+    }));
     // post to LiveTL API here
     if (sessionToken) {
       fetch(`${API}/translations/${env.VIDEO}`, {
@@ -188,29 +191,11 @@ const send = async (text, translation) => {
           translation,
           start: time / 1000
         })
-      })/*.then(async result=>{
-        fetch('/logs', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            text: await result.text()
-          })
-        });
-      })*/.catch(error => {
-          fetch('/logs', {
-            method: 'POST',
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              text: error.toString()
-            })
-          });
-        });
+      }).catch(error => {
+        logError(error);
+      });
+    } else {
+      logError(new TypeError('Session Token is unusable'));
     }
   }
 };
