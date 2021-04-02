@@ -54,6 +54,19 @@ const translate = text => {
   });
 };
 
+const logError = (e) => {
+  fetch('/error', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      message: `${e.error}: ${e.message}`
+    })
+  });
+};
+
 // eslint-disable-next-line no-undef
 googleTranslateElementInit = () => {
   // eslint-disable-next-line no-undef
@@ -117,16 +130,22 @@ function openConnection() {
 }
 
 // step 2: Keep alive, but no
-let isAlive = false;
 function keepAlive() {
   // eslint-disable-next-line no-unused-vars
-  isAlive = true;
-  // eslint-disable-next-line no-unused-vars
   const interval = setInterval(async () => {
-    const response = await fetch(`${API}/session/ping`);
-    // eslint-disable-next-line no-unused-vars
-    const pong = await response.text();
-    // Grumpy said don't worry about processing pong omegalul
+    try {
+      const response = await fetch(`${API}/session/ping`, {
+        headers: {
+          'Client-Name': 'Kanatran',
+          'Session-Token': sessionToken
+        }
+      });
+      // eslint-disable-next-line no-unused-vars
+      const pong = await response.text();
+      // Grumpy said don't worry about processing pong omegalul
+    } catch (e) {
+      logError(e);
+    }
   }, 300000);
 }
 // step 3: send to LiveTL api
@@ -221,16 +240,7 @@ recognition.onaudioend = () => recognition.stop();
 
 recognition.onerror = async e => {
   console.error('Error', e);
-  await fetch('/error', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      message: `${e.error}: ${e.message}`
-    })
-  });
+  logError(e);
 };
 
 recognition.onend = () => {
