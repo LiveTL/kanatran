@@ -7,14 +7,6 @@ from autoselenium import chrome
 
 
 class WebSpeechSlave(Thread):
-    """
-    Opens up web speech in the browser
-
-    export CHROME_REFRESH="x" to refresh chrome after x minutes
-                                default is 10
-    """
-
-    refresh_interval = 60 * int(os.environ.get("CHROME_REFRESH", 10))
 
     def __init__(self, host: str):
         super().__init__(daemon=True)
@@ -25,9 +17,7 @@ class WebSpeechSlave(Thread):
 
     def run(self):
         chrome.setup_driver()
-        while 1:
-            self.refresh()
-            time.sleep(self.refresh_interval)
+        self.refresh()
 
     def refresh(self):
         with self._refresh_lock:

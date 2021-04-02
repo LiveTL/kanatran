@@ -59,13 +59,6 @@ async def error(err: ClientError):
     return 200
 
 
-@app.post("/refresh")
-async def refresh():
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, web_speech.refresh)
-    return 200
-
-
 @app.post("/logs")
 async def transcript_event(log: Log):
     print("/logs", log.text, file=sys.stderr)
