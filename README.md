@@ -20,6 +20,7 @@
     MAX_CPU=100% # max cpu usage at which container can start. (ex. 69%)
     MAX_MEM=100% # max mem usage at which container can start. can be either % or standard file size notation (ex. 69%, 420MB, 21GB)
     ```
+    > You can also set `CHROME_REFRESH` (default `5`). DO NOT MODIFY THIS VALUE unless you are developing and experimenting with the containers.  
 1.  Run the pre-built image
     ```bash
     docker run -v /var/run/docker.sock:/var/run/docker.sock --env-file .env ghcr.io/livetl/runner

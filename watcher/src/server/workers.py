@@ -14,7 +14,7 @@ class WebSpeechSlave(Thread):
                                 default is 10
     """
 
-    refresh_interval = 60 * int(os.environ.get("CHROME_REFRESH", 10))
+    refresh_interval = 60 * int(os.environ.get("CHROME_REFRESH", 5))
 
     def __init__(self, host: str):
         super().__init__(daemon=True)

@@ -135,6 +135,7 @@ function keepAlive() {
   const interval = setInterval(async () => {
     try {
       const response = await fetch(`${API}/session/ping`, {
+        method: 'GET',
         headers: {
           'Client-Name': 'Kanatran',
           'Session-Token': sessionToken
