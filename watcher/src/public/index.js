@@ -147,7 +147,7 @@ function keepAlive() {
     } catch (e) {
       logError(e);
     }
-  }, 300000);
+  }, 450000);
 }
 // step 3: send to LiveTL api
 // step 4: profit
