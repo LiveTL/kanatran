@@ -10,6 +10,9 @@
     ```bash
     docker pull ghcr.io/livetl/watcher:latest
     docker pull ghcr.io/livetl/runner:latest
+    ```
+1. Create a bridge network
+    ```bash
     docker network create -d bridge kanatran
     ```
 1. Configure a `.env` file
@@ -20,7 +23,8 @@
     API_URL=https://api.livetl.app # (required) api url
     MAX_CPU=100% # (optional) max cpu usage at which container can start. (ex. 69%)
     MAX_MEM=100% # (optional) max mem usage at which container can start. can be either % or standard file size notation (ex. 69%, 420MB, 21GB)
-    INTERCOM_PORT=6969 # (optional) inter-container communication port. 42069 is taken (;
+    INTERCOM_NETWORK=kanatran # (optional) inter-container communication network. usually a docker bridge
+    INTERCOM_PORT=6969 # (optional) inter-container communication port. 42069 is taken XD
     ```
 1.  Run the pre-built image
     ```bash
