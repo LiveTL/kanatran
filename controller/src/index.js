@@ -48,7 +48,7 @@ function runQueue() {
         id: item,
         streamId: queue.top.data
       }));
-      sockets[item].runningContainers[queue.top.data] = false;
+      sockets[item].runningContainers[queue.top.data] = { playing: false };
       console.log(`Requesting to play ${queue.top.data} on ${item}`);
       // sockets[item].locked = true;
       queue.pop();
@@ -74,7 +74,7 @@ app.post('/stream', (req, res) => {
 app.post('/github', (req, res) => {
   res.status(200);
   res.end();
-  if (req.body.ref === 'refs/heads/master' ) {
+  if (req.body.ref === 'refs/heads/develop' ) {
     console.log('Pulling new changes and rebooting if neccessary...');
     exec('cd ..; make update &').stdout.pipe(process.stdout);
   }
@@ -93,7 +93,7 @@ wsServer.on('connection', (socket) => {
     switch (data.event){
     case 'status': {
       if (data.playing) {
-        sockets[socket.id].runningContainers[data.video] = true;
+        sockets[socket.id].runningContainers[data.video] = { playing: true };
         console.log(
           `${data.video} is ${data.alreadyPlaying ? 'already ' : ''}playing on ${socket.id}`
         );
@@ -117,6 +117,10 @@ wsServer.on('connection', (socket) => {
       break;
     } case 'usage': {
       sockets[socket.id].relativeLoad = data.relativeLoad;
+      updateLog();
+      break;
+    } case 'timestamp': {
+      sockets[socket.id].runningContainers[data.video].playBegin = data.playBegin;
       updateLog();
       break;
     }

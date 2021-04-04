@@ -1,3 +1,8 @@
+const watcherVersion = '1.2.0';
+
+// dynamic validation in case a range of versions are supported
+const watcherVersionSplit = watcherVersion.split('.').map(d => parseInt(d));
+
 /* eslint-disable no-new */
 
 const THRESHOLD = 0.75;
@@ -55,7 +60,7 @@ const translate = text => {
 };
 
 const logError = (e) => {
-  fetch('/error', {
+  return fetch('/error', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -68,7 +73,7 @@ const logError = (e) => {
 };
 
 const logNormal = data => {
-  fetch('/logs', {
+  return fetch('/logs', {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -104,14 +109,40 @@ recognition.onstart = () => {
 };
 
 let begin = new Date().getTime();
-fetch('/timestamp').then(d => d.json()).then(d => {
-  begin -= d.current * 1000;
-});
+
+const checkVersion = runnerVersion => {
+  try {
+    runnerVersion = runnerVersion.split('.').map(d => parseInt(d));
+    return (runnerVersion[0] === watcherVersionSplit[0] &&
+      runnerVersion[1] === watcherVersionSplit[1]);
+  } catch (e) {
+    return false;
+  }
+};
 
 let env = {};
-fetch('/env').then(r => r.json()).then(r => {
+fetch('/env').then(r => r.json()).then(async r => {
   env = r;
+  if (!checkVersion(env.RUNNER_VERSION)) {
+    await logError('Runner and watcher versions are incompatible');
+    window.close();
+  }
   API = env.API_URL || API;
+  fetch('/timestamp').then(d => d.json()).then(d => {
+    const PORT = parseInt(env.INTERCOM_PORT || 42069);
+    begin -= d.current * 1000;
+    fetch(`http://localhost:${PORT}/timestamp`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        video: env.VIDEO,
+        playBegin: begin.getTime()
+      })
+    });
+  });
   openConnection();
 });
 

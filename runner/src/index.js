@@ -1,5 +1,9 @@
-const clientVersion = '1.1.0';
+const clientVersion = '1.2.0';
 
+const express = require('express');
+const bodyParser = require('body-parser');
+const app = express();
+app.use(bodyParser.json());
 const {exec} = require('child_process');
 const dockerstats = require('dockerstats');
 const ENDPOINT = process.env.CONTROLLER_URL || 'ws://localhost:8000';
@@ -27,9 +31,10 @@ let shutdown = false;
 const round = num => Math.round(num * 10000) / 100;
 
 let wsQueue = [];
-function send(...args) {
-  if (ws.OPEN && !ws.CONNECTING) ws.send(...args);
-  else wsQueue.push(args);
+function send(arg) {
+  arg = JSON.stringify(arg);
+  if (ws.OPEN && !ws.CONNECTING) ws.send(arg);
+  else wsQueue.push(arg);
 }
 
 setInterval(() => {
@@ -42,10 +47,10 @@ setInterval(() => {
 }, 1000);
 
 function sendStats(relativeLoad) {
-  send(JSON.stringify({
+  send({
     event: 'usage',
     relativeLoad
-  }));
+  });
 }
 
 setInterval(statsGetter, 1000);
@@ -84,17 +89,18 @@ function play(data) {
       -e LIVETL_API_KEY='${LIVETL_API_KEY}' \\
       -e API_URL=${API_URL} \\
       --name ${data.streamId} \\
+      -e RUNNER_VERSION=${clientVersion}\\
       ${IMAGE_NAME}`
   );
   // process.stdout.pipe(process.stdout);
   process.stderr.on('data', output => {
     if (output.toString().includes('already in use by container')) {
-      send(JSON.stringify({
+      send({
         event: 'status',
         playing: true,
         alreadyPlaying: true,
         video: data.streamId
-      }));
+      });
       console.log(`${data.streamId} is already playing`);
     }
   });
@@ -112,11 +118,11 @@ function connect () {
       if (!dockerMonitor) monitor({
         onContainerUp: (container) => {
           if (initDone && !shutdown && container.Image === IMAGE_NAME && !playing[container.Name]) {
-            send(JSON.stringify({
+            send({
               event: 'status',
               playing: true,
               video: container.Name
-            }));
+            });
             console.log(`${container.Name} is playing!`);
             playing[container.Name] = true;
           }
@@ -124,11 +130,11 @@ function connect () {
 
         onContainerDown: (container) => {
           if (initDone && !shutdown && container.Image === IMAGE_NAME && playing[container.Name]) {
-            send(JSON.stringify({
+            send({
               event: 'status',
               playing: false,
               video: container.Name
-            }));
+            });
             console.log(`${container.Name} is done`);
             delete playing[container.Name];
           }
@@ -140,9 +146,9 @@ function connect () {
       switch (data.event){
       case 'socketid': {
         console.log(`ID is ${data.id}`);
-        send(JSON.stringify({
+        send({
           event: 'startinit'
-        }));
+        });
         break;
       } case 'play': {
         play(data);
@@ -150,12 +156,12 @@ function connect () {
       } case 'initdone': {
         sendStats(0);
         Object.keys(playing).forEach(video => {
-          send(JSON.stringify({
+          send({
             event: 'status',
             playing: true,
             alreadyPlaying: true,
             video
-          }));
+          });
           console.log(`Established that ${video} is still running`);
         });
         initDone = true;
@@ -194,3 +200,19 @@ process.on('SIGUSR2', exitHandler);
 process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 // process.on('uncaughtException', exitHandler);
+
+
+app.post('/timestamp', (req, res) => {
+  send({
+    event: 'timestamp',
+    video: req.body.video,
+    playBegin: req.body.playBegin
+  });
+  console.log(`${req.body.video} started playing at time`, new Date(req.body.playBegin));
+  res.status(200);
+});
+
+const INTERCOM = parseInt(process.env.INTERCOM_PORT || 42069);
+app.listen(INTERCOM, () => {
+  console.log(`Intercom listening on port ${INTERCOM}`);
+});

@@ -46,7 +46,7 @@ format: .gitignore node_modules
 .pull:
 	@git stash
 	@git reset --hard HEAD
-	@git checkout master
+	@git checkout develop
 	@git fetch --all
 	@git pull
 	@cd controller; npm install;
