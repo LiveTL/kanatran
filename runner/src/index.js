@@ -1,8 +1,10 @@
-const clientVersion = '1.2.0';
+const clientVersion = '1.3.0';
 
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const cors = require('cors');
+app.use(cors());
 app.use(bodyParser.json());
 const {exec} = require('child_process');
 const dockerstats = require('dockerstats');
@@ -22,12 +24,18 @@ if (MEM_IS_BYTES) MAX_MEM_VAR = bytes(MAX_MEM_VAR);
 else MAX_MEM_VAR = parseInt(MAX_MEM_VAR);
 const MAX_CPU = parseInt(process.env.MAX_CPU || '') || 100;
 const INTERCOM = parseInt(process.env.INTERCOM_PORT || 6969);
+const INTERCOM_NETWORK = process.env.INTERCOM_NETWORK || 'kanatran';
 
 const log = console.log;
 console.log = (...args) => log(new Date(), ...args);
 
 let playing = {};
 let shutdown = false;
+
+const criticalError = () => {
+  console.log('Critical error, logs above');
+  process.exit(1);
+};
 
 const round = num => Math.round(num * 10000) / 100;
 
@@ -92,11 +100,14 @@ function play(data) {
       --name ${data.streamId} \\
       -e RUNNER_VERSION=${clientVersion}\\
       -e INTERCOM_PORT=${INTERCOM}\\
+      -e HOSTNAME=$HOSTNAME\\
+      --network ${INTERCOM_NETWORK}\\
       ${IMAGE_NAME}`
   );
   // process.stdout.pipe(process.stdout);
   process.stderr.on('data', output => {
-    if (output.toString().includes('already in use by container')) {
+    output = output.toString();
+    if (output.includes('already in use by container')) {
       send({
         event: 'status',
         playing: true,
@@ -104,6 +115,9 @@ function play(data) {
         video: data.streamId
       });
       console.log(`${data.streamId} is already playing`);
+    } else {
+      console.log(output);
+      criticalError();
     }
   });
   console.log(`Starting ${data.streamId}`);
@@ -211,7 +225,7 @@ app.post('/timestamp', (req, res) => {
     playBegin: req.body.playBegin
   });
   console.log(`${req.body.video} started playing at time`, new Date(req.body.playBegin));
-  res.status(200);
+  res.status(200).send();
 });
 
 app.listen(INTERCOM, () => {

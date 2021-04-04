@@ -1,4 +1,4 @@
-const serverVersion = '1.2.0';
+const serverVersion = '1.3.0';
 
 // dynamic validation in case a range of versions are supported
 const serverVersionSplit = serverVersion.split('.').map(d => parseInt(d));

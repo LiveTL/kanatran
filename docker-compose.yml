@@ -1,7 +1,6 @@
 version: '3.3'
 services:
   watcher:
-    network_mode: bridge
     build:
       context: ./watcher
       dockerfile: ./Dockerfile
@@ -13,17 +12,23 @@ services:
     tty: true
     working_dir: /usr/src/watcher
     shm_size: '2gb'
+    networks:
+      - kanatran
   runner:
-    network_mode: bridge
     build:
       context: ./
       dockerfile: ./runner/Dockerfile
     env_file:
       - .env
-    image: runner
     restart: always
     stdin_open: true
     tty: true
     working_dir: /usr/src/runner
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - kanatran
+
+networks:
+  kanatran:
+    external: true

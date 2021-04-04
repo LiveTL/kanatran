@@ -1,4 +1,4 @@
-const watcherVersion = '1.2.0';
+const watcherVersion = '1.3.0';
 
 // dynamic validation in case a range of versions are supported
 const watcherVersionSplit = watcherVersion.split('.').map(d => parseInt(d));
@@ -130,8 +130,14 @@ fetch('/env').then(r => r.json()).then(async r => {
   API = env.API_URL || API;
   fetch('/timestamp').then(d => d.json()).then(d => {
     const PORT = parseInt(env.INTERCOM_PORT || 6969);
+    const HOSTNAME = env.HOSTNAME;
     begin -= d.current * 1000;
-    fetch(`http://localhost:${PORT}/timestamp`, {
+    logNormal(JSON.stringify({
+      HOSTNAME,
+      PORT,
+      video: env.VIDEO
+    }));
+    fetch(`http://${HOSTNAME}:${PORT}/timestamp`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -139,9 +145,9 @@ fetch('/env').then(r => r.json()).then(async r => {
       },
       body: JSON.stringify({
         video: env.VIDEO,
-        playBegin: begin.getTime()
+        playBegin: begin
       })
-    });
+    }).catch(logError);
   });
   openConnection();
 });
