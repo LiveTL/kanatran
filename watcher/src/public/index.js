@@ -129,7 +129,7 @@ fetch('/env').then(r => r.json()).then(async r => {
   }
   API = env.API_URL || API;
   fetch('/timestamp').then(d => d.json()).then(d => {
-    const PORT = parseInt(env.INTERCOM_PORT || 42069);
+    const PORT = parseInt(env.INTERCOM_PORT || 6969);
     begin -= d.current * 1000;
     fetch(`http://localhost:${PORT}/timestamp`, {
       method: 'POST',

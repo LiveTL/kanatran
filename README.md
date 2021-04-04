@@ -19,6 +19,7 @@
     API_URL=https://api.livetl.app # api url
     MAX_CPU=100% # max cpu usage at which container can start. (ex. 69%)
     MAX_MEM=100% # max mem usage at which container can start. can be either % or standard file size notation (ex. 69%, 420MB, 21GB)
+    INTERCOM_PORT=6969 # inter-container communication port. 42069 is taken (;
     ```
 1.  Run the pre-built image
     ```bash

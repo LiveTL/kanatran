@@ -21,6 +21,7 @@ const MEM_IS_BYTES = MAX_MEM_VAR.toLowerCase().endsWith('b');
 if (MEM_IS_BYTES) MAX_MEM_VAR = bytes(MAX_MEM_VAR);
 else MAX_MEM_VAR = parseInt(MAX_MEM_VAR);
 const MAX_CPU = parseInt(process.env.MAX_CPU || '') || 100;
+const INTERCOM = parseInt(process.env.INTERCOM_PORT || 6969);
 
 const log = console.log;
 console.log = (...args) => log(new Date(), ...args);
@@ -90,6 +91,7 @@ function play(data) {
       -e API_URL=${API_URL} \\
       --name ${data.streamId} \\
       -e RUNNER_VERSION=${clientVersion}\\
+      -e INTERCOM_PORT=${INTERCOM}\\
       ${IMAGE_NAME}`
   );
   // process.stdout.pipe(process.stdout);
@@ -212,7 +214,6 @@ app.post('/timestamp', (req, res) => {
   res.status(200);
 });
 
-const INTERCOM = parseInt(process.env.INTERCOM_PORT || 42069);
 app.listen(INTERCOM, () => {
   console.log(`Intercom listening on port ${INTERCOM}`);
 });
