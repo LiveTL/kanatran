@@ -17,22 +17,21 @@
     ```
 1. Configure a `.env` file
     ```bash
-    = # livetl api key
-    = # controller address
-    =ghcr.io/livetl/watcher # watcher image
-    =https://api.livetl.app # api url
-    =kanatran # inter-container communication network. usually a docker bridge
-    =6969 # inter-container communication port. 42069 is taken XD
-    =100% # max cpu usage at which container can start. (ex. 69%)
-    =100% # max mem usage at which container can start. can be either % or standard file size notation (ex. 69%, 420MB, 21GB)
+    LIVETL_API_KEY=
+    CONTROLLER_URL=
+    WATCHER_IMAGE=ghcr.io/livetl/watcher
+    API_URL=https://api.livetl.app
+    INTERCOM_NETWORK=kanatran
+    MAX_CPU=50%
+    MAX_MEM=4GB
     ```
     | Variable | Description | Default | Required | Values |
     |:---------|:------------|:--------|:---------|:-------|
-    | `LIVETL_API_KEY` | LiveTL API Key | `` | ✅ | String |
-    | `CONTROLLER_URL` | Controller Address | `` | ✅ | String |
-    | `WATCHER_IMAGE` | Watcher Image Name | `watcher` | ✅ | String |
-    | `API_URL` | API URL | `` | ✅ | String |
-    | `INTERCOM_NETWORK` | Inter-container Bridge Network Name | `kanatran` | ✅ | String |
+    | `LIVETL_API_KEY` | LiveTL API Key | ` ` | ✅ | String |
+    | `CONTROLLER_URL` | Controller Address | ` ` | ✅ | String |
+    | `WATCHER_IMAGE` | Watcher Image Name | `watcher` | ⚠ | String |
+    | `API_URL` | API URL | `https://api.livetl.app` | ⚠ | String |
+    | `INTERCOM_NETWORK` | Inter-container Bridge Network Name | `kanatran` | ⚠ | String |
     | `INTERCOM_PORT` | Inter-container Bridge Port | `6969` | ❌ | Integer |
     | `MAX_CPU` | Max CPU Usage | `100%` | ❌ | Percentage (`__%`) |
     | `MAX_MEM` | Max Memory Usage | `100%` | ❌ | Bytes (`__GB`, `__MB`, etc.), Percentage (`__%`) |
