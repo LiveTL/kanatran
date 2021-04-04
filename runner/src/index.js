@@ -42,12 +42,12 @@ const round = num => Math.round(num * 10000) / 100;
 let wsQueue = [];
 function send(arg) {
   arg = JSON.stringify(arg);
-  if (ws.OPEN && !ws.CONNECTING) ws.send(arg);
+  if (ws.readyState === 1) ws.send(arg);
   else wsQueue.push(arg);
 }
 
 setInterval(() => {
-  if (ws.OPEN && !ws.CONNECTING) {
+  if (ws.readyState === 1) {
     wsQueue.forEach(item => {
       ws.send(...item);
     });
