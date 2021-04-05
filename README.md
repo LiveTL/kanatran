@@ -19,29 +19,29 @@
 1. Configure a `.env` file
     ```bash
     LIVETL_API_KEY=
-    CONTROLLER_URL=wss://api.livetl.app/kanatran/
-    WATCHER_IMAGE=ghcr.io/livetl/watcher
-    API_URL=https://api.livetl.app
     INTERCOM_NETWORK=kanatran
     MAX_CPU=50%
     MAX_MEM=4GB
     ```
-
-    | Variable | Description | Default | Required | Values |
-    |:---------|:------------|:--------|:---------|:-------|
-    | `LIVETL_API_KEY` | LiveTL API Key | ` ` | ✅ | String |
-    | `WATCHER_IMAGE` | Watcher Image Name | `ghcr.io/livetl/watcher` | ❌ | String |
-    | `API_URL` | API URL | `https://api.livetl.app` | ❌ | String |
-    | `INTERCOM_NETWORK` | Inter-container Bridge Network Name | `kanatran` | ❌ | String |
-    | `CONTROLLER_URL` | Controller Address | `wss://api.livetl.app/kanatran/controller` | ❌ | String |
-    | `INTERCOM_PORT` | Inter-container Bridge Port | `6969` | ❌ | Integer |
-    | `MAX_CPU` | Max CPU Usage | `100%` | ❌ | Percentage (`__%`) |
-    | `MAX_MEM` | Max Memory Usage | `100%` | ❌ | Bytes (`__GB`, `__MB`, etc.), Percentage (`__%`) |
+    [View All Configurable Environment Variables](#Environment-Variables) 
 
 1.  Run the pre-built image
     ```bash
     docker run -v /var/run/docker.sock:/var/run/docker.sock --env-file .env ghcr.io/livetl/runner
     ```
+
+## Environment Variables
+
+| Variable | Description | Required | Values | Default |
+|:---------|:------------|:---------|:-------|:--------|
+| `LIVETL_API_KEY` | LiveTL API Key | ✅ | String | ` ` |
+| `WATCHER_IMAGE` | Watcher Image Name | ❌ | String | `ghcr.io/livetl/watcher` |
+| `API_URL` | API URL | ❌ | String | `https://api.livetl.app` |
+| `INTERCOM_NETWORK` | Inter-container Bridge Network Name | ❌ | String | `kanatran` |
+| `CONTROLLER_URL` | Controller Address | ❌ | String | `wss://api.livetl.app/kanatran/controller` |
+| `INTERCOM_PORT` | Inter-container Bridge Port | ❌ | Integer | `6969` |
+| `MAX_CPU` | Max CPU Usage | ❌ | Percentage (`__%`) | `100%` |
+| `MAX_MEM` | Max Memory Usage | ❌ | Bytes (`__GB`, `__MB`, etc.), Percentage (`__%`) | `100%` |
 
 ## Development
 
