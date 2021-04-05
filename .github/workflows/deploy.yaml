@@ -10,10 +10,12 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: webfactory/ssh-agent@v0.5.1
+      - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
         with:
-          ssh-private-key: ${{ secrets.PROD_SSH_KEY }}
+          SSHKEY: ${{ secrets.PROD_SSH_KEY }}
 
       - name: Run Deploy Script
         run: |
-          ssh ${{ secrets.PROD_SSH }} "cd /livetl/kanatran/controller; expect expect.exp ${{ secrets.PROD_PASSWORD }}"
+          ssh-keyscan -H ${{ secrets.PROD_IP }} >> ~/.ssh/known_hosts
+          ssh ${{ secrets.PROD_USERNAME }}@${{ secrets.PROD_IP }} \
+            "cd /livetl/kanatran/controller; expect expect.exp ${{ secrets.PROD_PASSWORD }}"
