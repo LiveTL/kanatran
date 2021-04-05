@@ -5,16 +5,17 @@
 
 ## Usage
 
-
 1. Pull the latest images
     ```bash
     docker pull ghcr.io/livetl/watcher:latest
     docker pull ghcr.io/livetl/runner:latest
     ```
+
 1. Create a bridge network
     ```bash
     docker network create -d bridge kanatran
     ```
+
 1. Configure a `.env` file
     ```bash
     LIVETL_API_KEY=
@@ -25,6 +26,7 @@
     MAX_CPU=50%
     MAX_MEM=4GB
     ```
+
     | Variable | Description | Default | Required | Values |
     |:---------|:------------|:--------|:---------|:-------|
     | `LIVETL_API_KEY` | LiveTL API Key | ` ` | ✅ | String |
@@ -35,6 +37,7 @@
     | `INTERCOM_PORT` | Inter-container Bridge Port | `6969` | ❌ | Integer |
     | `MAX_CPU` | Max CPU Usage | `100%` | ❌ | Percentage (`__%`) |
     | `MAX_MEM` | Max Memory Usage | `100%` | ❌ | Bytes (`__GB`, `__MB`, etc.), Percentage (`__%`) |
+
 1.  Run the pre-built image
     ```bash
     docker run -v /var/run/docker.sock:/var/run/docker.sock --env-file .env ghcr.io/livetl/runner
