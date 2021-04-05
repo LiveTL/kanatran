@@ -10,12 +10,15 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: LuisEnMarroquin/setup-ssh-action@v2.0.0
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
         with:
-          SSHKEY: ${{ secrets.PROD_SSH_KEY }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          name: id_rsa
+          known_hosts: ${{ secrets.PROD_KNOWN_HOSTS }}
+          if_key_exists: replace
 
       - name: Run Deploy Script
         run: |
-          ssh-keyscan -H ${{ secrets.PROD_IP }} >> ~/.ssh/known_hosts
           ssh ${{ secrets.PROD_USERNAME }}@${{ secrets.PROD_IP }} \
             "cd /livetl/kanatran/controller; expect expect.exp ${{ secrets.PROD_PASSWORD }}"
