@@ -1,7 +1,7 @@
 set timeout -1
 set pswd [lindex $argv 0];
-spawn systemctl restart kanatran
+spawn sudo sh deploy.sh
 match_max 100000
-expect "*Password: "
+expect "*password for *:"
 send -- "$pswd\r"
 expect eof
