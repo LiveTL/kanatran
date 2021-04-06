@@ -57,7 +57,6 @@
 ```bash
 git clone https://github.com/LiveTL/Kanatran
 ```
-Make sure to replace your `WATCHER_IMAGE` in `.env` with `watcher` to use your development image.
 
 ### Dev Info
 
