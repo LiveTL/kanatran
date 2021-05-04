@@ -1,7 +1,23 @@
 # Kanatran
+
+An automatic livestream caption/translation system for Japanese Vtubers [WORK IN PROGRESS]
+
 [![Build Runner](https://github.com/LiveTL/kanatran/actions/workflows/build_runner.yaml/badge.svg)](https://github.com/LiveTL/kanatran/actions/workflows/build_runner.yaml)
 [![Build Watcher](https://github.com/LiveTL/kanatran/actions/workflows/build_watcher.yaml/badge.svg)](https://github.com/LiveTL/kanatran/actions/workflows/build_watcher.yaml)
 [![Deploy to Production](https://github.com/LiveTL/kanatran/actions/workflows/deploy.yaml/badge.svg)](https://github.com/LiveTL/kanatran/actions/workflows/deploy.yaml)
+
+## About
+
+LiveTL is building an automatic livestream caption/translation system for Japanese Vtubers, and we need your support.
+
+I'll get straight to the point: we developed a system called Kanatran to generate machine translations for Japanese Vtuber streams in realtime, and we need some funding to deploy it. Below are the things we want to achieve:
+1.  Run Kantran on Japanese Hololive and Holostars streams, as well as selected agencies / independents
+2.  Provide Kanatran translations to users of LiveTL 
+3.  Make our automated translations accessible to other 3rd party apps and websites for watching Vtubers
+
+To do this, we need some financial support to kickstart our efforts. Our team accepts donations through Open Collective, a platform that makes our spendings completely transparent to donators. We will use funding from supporters to run our servers and translation software. We currently have about $750, which would only last a few short months. Please consider chipping in here: https://opencollective.com/livetl
+
+Our system is extremely low cost compared to previous attempts at machine translations, and we will make our entire transcription/translation technology completely free and open source here on GitHub. Additionally, we will make our machine translations as accessible as possible -- if you are developer that wants to access our translations, please reach out to us (preferably through our Discord server). Our goal is not to monopolize this technology, but to use it to improve the Vtuber-watching experience for everyone in this community.
 
 ## Usage
 
