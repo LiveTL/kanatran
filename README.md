@@ -1,5 +1,7 @@
 # Kanatran
 
+## KanaTran is no longer being activly worked on, use at your own risk
+
 An automatic livestream caption/translation system for Japanese Vtubers [WORK IN PROGRESS]
 
 [![Build Runner](https://github.com/LiveTL/kanatran/actions/workflows/build_runner.yaml/badge.svg)](https://github.com/LiveTL/kanatran/actions/workflows/build_runner.yaml)
