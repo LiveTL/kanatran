@@ -1,6 +1,6 @@
 # Kanatran
 
-## KanaTran is no longer being activly worked on, use at your own risk
+# [Kanatran has been discontinued and is no longer being developed. Please read our announcement post here.](https://www.reddit.com/r/Hololive/comments/n9fvye/regarding_automatic_translations_livetl/)
 
 An automatic livestream caption/translation system for Japanese Vtubers [WORK IN PROGRESS]
 
